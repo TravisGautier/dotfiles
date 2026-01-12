@@ -8,6 +8,17 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-11
 
+### Hyprlock Monitor Fix
+
+**Problem:** Lock screen broken - secondary monitor didn't go black, login dialog invisible, but PIN input still worked
+
+**Diagnosis:** hyprlock.conf referenced old monitor names (DP-1, DP-3) that no longer exist. Actual monitors are DP-6 (primary) and DP-4 (secondary).
+
+**Resolution:**
+- Updated hyprlock.conf: DP-1→DP-4 (secondary background), DP-3→DP-6 (all UI elements)
+- Updated lock-with-video.sh: monitor DP-3→DP-6, layer top→overlay, added 0.3s delay for mpvpaper init
+- Now tracking `~/.local/bin/` scripts in dotfiles repo
+
 ### Wallpaper Setup
 
 - Switched from hyprpaper to swaybg (hyprpaper was crashing)
