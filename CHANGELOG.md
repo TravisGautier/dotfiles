@@ -8,6 +8,12 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-11
 
+### Wallpaper Setup
+
+- Switched from hyprpaper to swaybg (hyprpaper was crashing)
+- Added dual-monitor spanning wallpaper using split images
+- Config: `exec-once = swaybg -o DP-6 -i .../nebula-left.png` and `DP-4` with right half
+
 ### Boot Time Investigation
 
 **Problem:** System boot taking ~2 minutes (70+ seconds in kernel phase before systemd starts)
