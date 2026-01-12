@@ -17,6 +17,7 @@ dunst
 efibootmgr
 firefox
 git
+github-cli
 grim
 grub
 gst-plugin-pipewire
