@@ -62,6 +62,16 @@ pacman -Qqe > packages-official.txt
 pacman -Qqm > packages-aur.txt
 ```
 
+## Changelog
+
+See `CHANGELOG.md` for system configuration history and troubleshooting sessions.
+
+When making significant changes, add an entry with:
+- Date header (`## YYYY-MM-DD`)
+- Category subheader (e.g., `### Hyprland Config`, `### Boot Investigation`)
+- For debugging sessions: include Problem, Diagnosis, and Status
+- For simple changes: bullet points
+
 ## NVIDIA Environment
 
 Required env vars are set in hyprland.conf:
