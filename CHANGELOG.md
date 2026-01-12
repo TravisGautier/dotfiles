@@ -54,9 +54,9 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 **Actions taken:**
 - Analyzed boot with `systemd-analyze blame` and `dmesg`
 - Identified USB enumeration as the bottleneck
-- Rebuilt initramfs (`mkinitcpio -P`)
+- Rebuilt initramfs (`mkinitcpio -P`) - no effect, confirms kernel-level issue
 
-**Status:** Pending - will fully resolve once AIO USB is connected. Workaround available: reduce timeout via `usbcore.initial_descriptor_timeout=500` kernel parameter.
+**Status:** Pending - need USB cable extender to connect AIO. Workaround: reduce timeout via `usbcore.initial_descriptor_timeout=500` kernel parameter.
 
 ### SDDM Display Manager
 
