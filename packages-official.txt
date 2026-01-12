@@ -29,7 +29,6 @@ hyprlock
 hyprpaper
 iwd
 kitty
-kwin
 layer-shell-qt
 libpulse
 libva-nvidia-driver
@@ -48,6 +47,7 @@ nodejs
 npm
 ntfs-3g
 nvidia-open-dkms
+openrgb
 os-prober
 pipewire
 pipewire-alsa
@@ -63,6 +63,7 @@ sddm
 slurp
 smartmontools
 sudo
+swaybg
 system-config-printer
 uwsm
 valkey

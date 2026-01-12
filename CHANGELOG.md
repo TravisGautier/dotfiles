@@ -8,6 +8,27 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-12
 
+### Suspend/Resume Fix - NVIDIA Configuration
+
+**Problem:** System suspends but doesn't resume - black screen with fans running, requires hard power off
+
+**Diagnosis:**
+- Suspend was working after NVIDIA 590.48.01 driver install
+- Broke after DM testing (SDDM, Weston, KWin) on Jan 11
+- This was a configuration regression, not a driver bug
+- KWin installation brought in 21 plasma packages that may have conflicted with Hyprland display handling
+- NVIDIA modules were not early-loaded via mkinitcpio (race condition risk on resume)
+
+**Fix applied:**
+- Added NVIDIA modules to `/etc/mkinitcpio.conf`: `MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)`
+- Removed kwin and 21 plasma dependencies (aurorae, breeze, kdecoration, kscreenlocker, libkscreen, libplasma, etc.)
+- Cleaned up KDE config files (~/.config/kwinrc, powerdevilrc, powermanagementprofilesrc)
+- Rebuilt initramfs with `mkinitcpio -P`
+
+**Status:** Pending verification after reboot
+
+---
+
 ### OpenRGB RAM Sleep Configuration
 
 **Problem:** RAM RGB (Corsair Dominator Platinum x4) stays lit during sleep while other RGB turns off
