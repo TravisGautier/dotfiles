@@ -1,0 +1,12 @@
+[Unit]
+Description=Turn off RGB before sleep
+Before=sleep.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/rgb-sleep-hook.sh pre
+ExecStop=/usr/local/bin/rgb-sleep-hook.sh post
+RemainAfterExit=yes
+
+[Install]
+WantedBy=sleep.target

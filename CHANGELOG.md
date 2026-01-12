@@ -6,6 +6,27 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-01-12
+
+### OpenRGB RAM Sleep Configuration
+
+**Problem:** RAM RGB (Corsair Dominator Platinum x4) stays lit during sleep while other RGB turns off
+
+**Setup:**
+- Installed OpenRGB from AUR
+- Loaded i2c-dev and i2c-piix4 kernel modules (AMD system)
+- Created systemd sleep hook to turn off RAM RGB before suspend
+- Detected devices: 4x Corsair Dominator Platinum, iCUE Link System Hub, ASUS ROG STRIX X870-A, G502 mouse
+
+**Files created:**
+- `/etc/modules-load.d/i2c.conf` - persistent i2c module loading
+- `/etc/systemd/system/rgb-sleep.service` - sleep hook service
+- `/usr/local/bin/rgb-sleep-hook.sh` - script to turn off RAM RGB
+
+**Status:** Pending verification - sleep/suspend may have broader configuration issues to investigate
+
+---
+
 ## 2026-01-11
 
 ### Idle Timeout Freeze Investigation
