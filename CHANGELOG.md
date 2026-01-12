@@ -8,6 +8,22 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-11
 
+### Idle Timeout Freeze Investigation
+
+**Problem:** Screen freezes after idle timeout - no response to input, TTY switching works but unreliable
+
+**Diagnosis in progress:**
+- Suspected causes: DPMS + suspend race condition, dual GPU conflict (NVIDIA + AMD iGPU), Hyprland compositor hang on wake
+- NVIDIA sleep handler failure detected: `asus_wmi: failed to register LPS0 sleep handler`
+
+**Setup:**
+- Added diagnostic logging to hypridle.conf (LOCK_START, DPMS_OFF, SUSPEND_START, etc.)
+- Created `~/.local/bin/idle-log.sh` - timestamps all idle events to `/tmp/idle-events.log`
+- Created `~/.local/bin/resume-diag.sh` - captures full system state after freeze
+- Created `/etc/systemd/system/debug-sleep.service` - logs systemd sleep events
+
+**Status:** Diagnostic logging enabled, waiting to capture a freeze event
+
 ### Hyprlock Monitor Fix
 
 **Problem:** Lock screen broken - secondary monitor didn't go black, login dialog invisible, but PIN input still worked
