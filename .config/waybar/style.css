@@ -1,0 +1,49 @@
+* {
+    font-family: "JetBrains Mono", "Font Awesome 6 Free", monospace;
+    font-size: 13px;
+}
+
+window#waybar {
+    background-color: rgba(26, 27, 38, 0.9);
+    color: #c0caf5;
+    border-bottom: 2px solid rgba(51, 204, 255, 0.5);
+}
+
+#workspaces button {
+    padding: 0 8px;
+    color: #c0caf5;
+    background-color: transparent;
+    border-radius: 4px;
+    margin: 2px;
+}
+
+#workspaces button:hover {
+    background-color: rgba(51, 204, 255, 0.2);
+}
+
+#workspaces button.active {
+    background-color: #33ccff;
+    color: #1a1b26;
+}
+
+#clock,
+#network,
+#pulseaudio,
+#cpu,
+#memory,
+#tray {
+    padding: 0 10px;
+    margin: 0 4px;
+}
+
+#network.disconnected {
+    color: #f7768e;
+}
+
+#pulseaudio.muted {
+    color: #565f89;
+}
+
+#tray > .passive {
+    -gtk-icon-effect: dim;
+}

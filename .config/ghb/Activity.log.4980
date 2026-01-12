@@ -1,0 +1,73 @@
+OS: Manjaro Linux
+HandBrake 1.7.2 (2023122400)
+Kernel: Linux 6.1.71-1-MANJARO (x86_64)
+CPU: AMD Ryzen 5 3600 6-Core Processor x 12
+Install Dir: /usr/bin
+Config Dir:  /home/travis/.config/ghb
+_______________________________
+
+[21:55:15] Compile-time hardening features are enabled
+Cannot load libnvidia-encode.so.1
+[21:55:15] qsv: not available on this system
+[21:55:15] hb_init: starting libhb thread
+[21:55:15] hb_init: starting libhb thread
+[21:55:15] hb_init: starting libhb thread
+[21:55:15] CPU: AMD Ryzen 5 3600 6-Core Processor
+[21:55:15]  - logical processor count: 12
+[21:55:15] Intel Quick Sync Video support: no
+[21:55:15] hb_scan: path=/mnt/sda/Forum/The.Man.in.the.High.Castle.S01.2160p.AMZN.WEBRip.DD5.1.x264-TrollUHD[rartv]/The Man in the High Castle S01E01 2160p Amazon WEBRip DD5.1 x264-TrollUHD.mkv, title_index=0
+Input #0, matroska,webm, from '/mnt/sda/Forum/The.Man.in.the.High.Castle.S01.2160p.AMZN.WEBRip.DD5.1.x264-TrollUHD[rartv]/The Man in the High Castle S01E01 2160p Amazon WEBRip DD5.1 x264-TrollUHD.mkv':
+  Metadata:
+    encoder         : libebml v1.3.1 + libmatroska v1.4.2
+    creation_time   : 2016-03-12T03:28:35.000000Z
+  Duration: 01:00:09.56, start: 0.000000, bitrate: 29591 kb/s
+  Stream #0:0: Video: h264 (High), yuv420p(progressive), 3840x2160 [SAR 1:1 DAR 16:9], 23.98 fps, 23.98 tbr, 1k tbn (default)
+    Metadata:
+      BPS             : 28949179
+      BPS-eng         : 28949179
+      DURATION        : 01:00:09.564000000
+      DURATION-eng    : 01:00:09.564000000
+      NUMBER_OF_FRAMES: 86543
+      NUMBER_OF_FRAMES-eng: 86543
+      NUMBER_OF_BYTES : 13061739508
+      NUMBER_OF_BYTES-eng: 13061739508
+      _STATISTICS_WRITING_APP: mkvmerge v8.3.0 ('Over the Horizon') 64bit
+      _STATISTICS_WRITING_APP-eng: mkvmerge v8.3.0 ('Over the Horizon') 64bit
+      _STATISTICS_WRITING_DATE_UTC: 2016-03-12 03:28:35
+      _STATISTICS_WRITING_DATE_UTC-eng: 2016-03-12 03:28:35
+      _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+  Stream #0:1(eng): Audio: ac3, 48000 Hz, 5.1(side), fltp, 640 kb/s (default)
+    Metadata:
+      BPS             : 640000
+      BPS-eng         : 640000
+      DURATION        : 01:00:09.504000000
+      DURATION-eng    : 01:00:09.504000000
+      NUMBER_OF_FRAMES: 112797
+      NUMBER_OF_FRAMES-eng: 112797
+      NUMBER_OF_BYTES : 288760320
+      NUMBER_OF_BYTES-eng: 288760320
+      _STATISTICS_WRITING_APP: mkvmerge v8.3.0 ('Over the Horizon') 64bit
+      _STATISTICS_WRITING_APP-eng: mkvmerge v8.3.0 ('Over the Horizon') 64bit
+      _STATISTICS_WRITING_DATE_UTC: 2016-03-12 03:28:35
+      _STATISTICS_WRITING_DATE_UTC-eng: 2016-03-12 03:28:35
+      _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+  Stream #0:2(eng): Subtitle: subrip
+    Metadata:
+      BPS             : 50
+      BPS-eng         : 50
+      DURATION        : 00:58:20.964000000
+      DURATION-eng    : 00:58:20.964000000
+      NUMBER_OF_FRAMES: 721
+      NUMBER_OF_FRAMES-eng: 721
+      NUMBER_OF_BYTES : 22167
+      NUMBER_OF_BYTES-eng: 22167
+      _STATISTICS_WRITING_APP: mkvmerge v8.3.0 ('Over the Horizon') 64bit
+      _STATISTICS_WRITING_APP-eng: mkvmerge v8.3.0 ('Over the Horizon') 64bit
+      _STATISTICS_WRITING_DATE_UTC: 2016-03-12 03:28:35
+      _STATISTICS_WRITING_DATE_UTC-eng: 2016-03-12 03:28:35
+      _STATISTICS_TAGS: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+      _STATISTICS_TAGS-eng: BPS DURATION NUMBER_OF_FRAMES NUMBER_OF_BYTES
+[21:55:15] scan: decoding previews for title 1
+[21:55:15] scan: audio 0x1: ac3, rate=48000Hz, bitrate=640000 English (AC3, 5.1 ch, 640 kbps)

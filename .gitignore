@@ -1,0 +1,36 @@
+# Logs and temp files
+*.log
+*.tmp
+*.swp
+*~
+
+# Cache directories
+**/Cache/
+**/GPUCache/
+**/CacheStorage/
+**/.cache/
+**/cache/
+
+# Sockets
+*.sock
+*.socket
+
+# Thumbnails and generated
+*.db
+*.db-journal
+Thumbnails/
+
+# Session tokens (security)
+**/cookies*
+**/sessions/
+**/*.bak
+
+# Large binary files
+*.iso
+*.img
+# Sensitive app data
+**/Bitwarden/
+**/kdeconnect/
+*.pem
+**/privateKey*
+.config/stripe/
