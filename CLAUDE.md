@@ -4,50 +4,27 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## System Overview
 
-Hyprland-based Arch Linux desktop environment with dual monitors (AOC 4K + ASUS curved), NVIDIA GPU, and catppuccin-mocha theming.
-
-## Key Keybindings (SUPER = Windows key)
-
-| Keys | Action |
-|------|--------|
-| SUPER+Q | Terminal (kitty) |
-| SUPER+R | App launcher (hyprlauncher) |
-| SUPER+E | File manager (dolphin) |
-| SUPER+F | Firefox |
-| SUPER+C | Close window |
-| SUPER+M | Logout menu (wlogout) |
-| SUPER+L | Lock screen |
-| SUPER+V | Toggle floating |
-| SUPER+1-0 | Switch workspace |
-| SUPER+SHIFT+1-0 | Move window to workspace |
+Hyprland-based Arch Linux desktop environment with dual monitors (AOC 4K + ASUS curved), NVIDIA RTX GPU (iGPU disabled in BIOS), and catppuccin-mocha theming.
 
 ## Monitor Setup
 
 ```
-DP-3 (AOC 4K) - Left, scaled 1.5x
-DP-1 (ASUS)   - Right, native res
+DP-3 (AOC U32V3 4K)    - Left, position 0x0, scaled 1.5x
+DP-1 (ASUS VG32VQ1B)   - Right, position 2560x0, native res
 ```
 
-## Core Components
+**Important:** Monitor port names are tied to the NVIDIA GPU. The AMD iGPU is disabled in BIOS to prevent port assignment conflicts.
 
-- **WM**: Hyprland (dwindle layout)
-- **Bar**: Waybar (top, minimal)
-- **Terminal**: Kitty (catppuccin-mocha theme)
-- **Launcher**: hyprlauncher
-- **Lock**: hyprlock + mpvpaper video background
-- **Idle**: hypridle (lock 5min, dpms off 10min, suspend 15min)
+## Dotfiles Architecture
 
-## Config Locations
+This repo uses **symlinks** for config management:
+- `~/.config/hypr` → `~/dotfiles/.config/hypr` (symlink)
+- Shell dotfiles (`.bashrc`, `.zshrc`, etc.) → symlinked to repo
+- `/etc/` configs are tracked but require manual `sudo cp` to apply
 
-| Component | Config Path |
-|-----------|-------------|
-| Hyprland | `~/.config/hypr/hyprland.conf` |
-| Waybar | `~/.config/waybar/config.jsonc`, `style.css` |
-| Kitty | `~/.config/kitty/kitty.conf` |
-| Idle/Lock | `~/.config/hypr/hypridle.conf`, `hyprlock.conf` |
-| Lock script | `~/.local/bin/lock.sh` |
+Run `./install.sh` to set up symlinks on a new system.
 
-## Dotfiles Commands
+## Key Commands
 
 ```bash
 # Restore to new system
@@ -60,39 +37,56 @@ yay -S --needed - < packages-aur.txt
 # Update package lists
 pacman -Qqe > packages-official.txt
 pacman -Qqm > packages-aur.txt
+
+# Hyprland
+hyprctl monitors          # List monitors with port names
+hyprctl reload            # Reload config without restart
+hyprctl clients           # List windows
+```
+
+## Core Components
+
+| Component | Tool | Config |
+|-----------|------|--------|
+| WM | Hyprland (dwindle) | `.config/hypr/hyprland.conf` |
+| Bar | Waybar | `.config/waybar/config.jsonc`, `style.css` |
+| Terminal | Kitty | `.config/kitty/kitty.conf` |
+| Launcher | hyprlauncher | SUPER+R |
+| Lock | hyprlock | `.config/hypr/hyprlock.conf` |
+| Idle | hypridle | `.config/hypr/hypridle.conf` |
+| Wallpaper | swaybg | exec-once in hyprland.conf |
+
+## Key Keybindings (SUPER = Windows key)
+
+| Keys | Action |
+|------|--------|
+| SUPER+Q | Terminal (kitty) |
+| SUPER+R | App launcher |
+| SUPER+F | Firefox |
+| SUPER+C | Close window |
+| SUPER+L | Lock screen |
+| SUPER+M | Logout menu |
+| SUPER+1-0 | Switch workspace |
+
+## NVIDIA Configuration
+
+Required env vars in hyprland.conf:
+```
+env = LIBVA_DRIVER_NAME,nvidia
+env = GBM_BACKEND,nvidia-drm
+env = __GLX_VENDOR_LIBRARY_NAME,nvidia
+```
+
+NVIDIA modules early-loaded in `/etc/mkinitcpio.conf`:
+```
+MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
 ```
 
 ## Changelog
 
-See `CHANGELOG.md` for system configuration history and troubleshooting sessions.
+See `CHANGELOG.md` for configuration history and troubleshooting sessions. **Always update changelog before committing significant changes.**
 
-When making significant changes, add an entry with:
-- Date header (`## YYYY-MM-DD`)
-- Category subheader (e.g., `### Hyprland Config`, `### Boot Investigation`)
-- For debugging sessions: include Problem, Diagnosis, and Status
-- For simple changes: bullet points
-
-## NVIDIA Environment
-
-Required env vars are set in hyprland.conf:
-- `LIBVA_DRIVER_NAME=nvidia`
-- `GBM_BACKEND=nvidia-drm`
-- `__GLX_VENDOR_LIBRARY_NAME=nvidia`
-
-## Audio
-
-PipeWire/WirePlumber via `wpctl`:
-```bash
-wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+   # Volume up
-wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-   # Volume down
-wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle  # Mute toggle
-```
-
-## Useful Hyprland Commands
-
-```bash
-hyprctl monitors          # List monitors
-hyprctl clients           # List windows
-hyprctl dispatch dpms off # Screens off
-hyprctl reload            # Reload config
-```
+Format:
+- Date header: `## YYYY-MM-DD`
+- Category: `### Component Name`
+- For debugging: Problem, Diagnosis, Status sections

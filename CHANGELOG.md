@@ -8,6 +8,30 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-12
 
+### Monitor Port Configuration Fix
+
+**Problem:** Monitor settings (left/right position, 1.5x scaling on AOC 4K) kept reverting on every reboot. Monitors would swap positions and lose scaling.
+
+**Diagnosis:**
+- System has both AMD Ryzen iGPU and NVIDIA RTX GPU
+- On different boots, monitors would land on different GPU's ports:
+  - NVIDIA (card2): DP-4, DP-6
+  - AMD iGPU (card1): DP-1, DP-3
+- Hyprland config referenced specific port names, which changed unpredictably
+- Additionally, `~/.config/hypr/` was a regular directory (not symlink), owned by root
+
+**Fix applied:**
+1. Disabled AMD iGPU in BIOS - NVIDIA is now the only display controller
+2. With iGPU disabled, NVIDIA becomes card1 with stable ports: DP-1 (ASUS), DP-3 (AOC)
+3. Updated hyprland.conf: `monitor=DP-3,preferred,0x0,1.5` and `monitor=DP-1,preferred,2560x0,auto`
+4. Updated swaybg wallpaper commands to use DP-3/DP-1
+5. Fixed ownership: `chown -R travis:travis ~/dotfiles/.config/hypr/`
+6. Created proper symlink: `~/.config/hypr` → `~/dotfiles/.config/hypr`
+
+**Status:** Resolved. Monitor config now persists across reboots.
+
+---
+
 ### Suspend/Resume Fix - NVIDIA Configuration
 
 **Problem:** System suspends but doesn't resume - black screen with fans running, requires hard power off
