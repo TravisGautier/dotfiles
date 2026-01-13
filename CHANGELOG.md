@@ -43,13 +43,25 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 - KWin installation brought in 21 plasma packages that may have conflicted with Hyprland display handling
 - NVIDIA modules were not early-loaded via mkinitcpio (race condition risk on resume)
 
-**Fix applied:**
+**Fix applied (Phase 1):**
 - Added NVIDIA modules to `/etc/mkinitcpio.conf`: `MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)`
 - Removed kwin and 21 plasma dependencies (aurorae, breeze, kdecoration, kscreenlocker, libkscreen, libplasma, etc.)
 - Cleaned up KDE config files (~/.config/kwinrc, powerdevilrc, powermanagementprofilesrc)
 - Rebuilt initramfs with `mkinitcpio -P`
 
-**Status:** Pending verification after reboot
+**Fix applied (Phase 2 - fans stayed on, system never entered deep sleep):**
+- Root cause: System stuck in s2idle (shallow freeze) instead of S3 deep sleep
+- Fans staying on = system never actually suspends, just freezes display
+- Added `mem_sleep_default=deep` kernel parameter to `/etc/default/grub`
+- Regenerated GRUB config
+
+**Status:** Pending verification - fans should STOP when suspended (proves S3 working)
+
+---
+
+### Hyprland Keybinds
+
+- Added `SUPER+O` → launch Obsidian
 
 ---
 

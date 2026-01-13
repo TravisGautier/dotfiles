@@ -47,6 +47,7 @@ nodejs
 npm
 ntfs-3g
 nvidia-open-dkms
+obsidian
 openrgb
 os-prober
 pipewire
