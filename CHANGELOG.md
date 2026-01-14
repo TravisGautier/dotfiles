@@ -80,7 +80,30 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 - This tells ACPI firmware that Linux is NOT Windows 10, triggering different (working) code paths
 - Regenerated GRUB config
 
-**Status:** Pending verification - fans should STOP when suspended (proves S3 working)
+**Status:** Still broken after reboot
+
+**Fix applied (Phase 4 - Missing NVIDIA power management options):**
+- Log analysis showed: suspend initiated → NVIDIA prep completed → system hung → hard reboot 3 min later
+- Root cause: `/etc/modprobe.d/nvidia.conf` was missing critical power management options
+- Original config only had: `options nvidia_drm modeset=1`
+- Without `NVreg_PreserveVideoMemoryAllocations=1`, NVIDIA doesn't save VRAM during suspend
+- On resume, no VRAM state to restore → black screen with fans running
+
+**Config applied:**
+```
+options nvidia_drm modeset=1 fbdev=1
+options nvidia NVreg_PreserveVideoMemoryAllocations=1 NVreg_TemporaryFilePath=/var/tmp
+```
+- Rebuilt initramfs with `mkinitcpio -P`
+
+**Additional findings:**
+- `asus_wmi: failed to register LPS0 sleep handler` - cosmetic warning, not causing hang
+- USB 1-11 (AIO header) timeout errors still present - potential contributing factor
+- Kernel 6.18.3 may have suspend regressions (users report 6.17+ issues, LTS works)
+
+**Status:** Pending verification after reboot. If still broken, try:
+1. Install `linux-lts` kernel as fallback
+2. Disable USB 1-11 wake source: `echo disabled > /sys/bus/usb/devices/usb1/power/wakeup`
 
 ---
 
