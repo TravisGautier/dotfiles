@@ -54,6 +54,15 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 - Fans staying on = system never actually suspends, just freezes display
 - Added `mem_sleep_default=deep` kernel parameter to `/etc/default/grub`
 - Regenerated GRUB config
+- Result: Did NOT fix the issue
+
+**Fix applied (Phase 3 - ACPI firmware bug on AM5/X870):**
+- Research confirmed this is a known AM5/X870 ACPI firmware bug affecting multiple vendors
+- Modern AM5 motherboard DSDT tables have Windows-specific code paths that break S3 on Linux
+- Sources: [Arch Wiki](https://wiki.archlinux.org/title/Wakeup_triggers), [CachyOS Forum](https://discuss.cachyos.org/t/suspend-to-ram-s3-fails-immediate-wake-or-hang-during-suspend-x870-aorus-elite-wifi-cachyos/14366)
+- Added `acpi_osi="!Windows 2015"` kernel parameter to `/etc/default/grub`
+- This tells ACPI firmware that Linux is NOT Windows 10, triggering different (working) code paths
+- Regenerated GRUB config
 
 **Status:** Pending verification - fans should STOP when suspended (proves S3 working)
 
