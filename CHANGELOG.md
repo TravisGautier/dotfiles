@@ -6,6 +6,22 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-01-13
+
+### Dolphin Translucency with Kvantum
+
+- Installed Kvantum Qt style engine for true window translucency
+- Added `QT_STYLE_OVERRIDE=kvantum` env var to hyprland.conf
+- Configured KvGnomeDark theme with:
+  - `translucent_windows=true`
+  - `transparent_dolphin_view=true`
+  - `blurring=true`, `blur_translucent=true`
+  - `reduce_window_opacity=10` (90% opacity)
+- Added Dolphin opacity windowrule as fallback (0.9 active/inactive)
+- Now tracking `.config/Kvantum/` in dotfiles
+
+---
+
 ## 2026-01-12
 
 ### Monitor Port Configuration Fix
