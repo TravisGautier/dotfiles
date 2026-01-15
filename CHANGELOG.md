@@ -8,6 +8,38 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-14
 
+### Migration from SDDM to greetd
+
+**Problem:** SDDM has an architectural flaw causing getty/VT race conditions ([Issue #1844](https://github.com/sddm/sddm/issues/1844)). When SDDM allocates Hyprland to a VT where getty is still "active" according to logind, the session fails to take seat control.
+
+**Solution:** Migrated to greetd with Hyprland as the greeter compositor, preserving video background capability from the timewave2 SDDM theme.
+
+**New stack:**
+- **greetd** - Login daemon with proper session/seat handling
+- **Hyprland** - Greeter compositor (same as main session)
+- **mpvpaper** - Video background player (reusing timewave2 video)
+- **ReGreet** - GTK4 login UI with custom CSS theming
+
+**Files created:**
+- `/etc/greetd/config.toml` - greetd configuration
+- `/etc/greetd/hyprland.conf` - Greeter-specific Hyprland config
+- `/etc/greetd/regreet.toml` - ReGreet configuration
+- `/etc/greetd/regreet.css` - Timewave2 theme (glassmorphism, green accent)
+
+**Services:**
+- Disabled: `sddm`
+- Enabled: `greetd`
+
+**Status:** Pending verification - reboot required.
+
+---
+
+### Hyprland Keybinds
+
+- Added `SUPER+K` → launch Kate
+
+---
+
 ### SDDM/Hyprland Login Failure - seatd Not Running
 
 **Problem:** After rebooting from Windows 11, SDDM login to Hyprland failed - session crashed within 1 second, dropping to TTY.

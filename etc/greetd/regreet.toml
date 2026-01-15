@@ -1,0 +1,21 @@
+[background]
+# No background image - using mpvpaper for video
+# path = ""
+
+[GTK]
+application_prefer_dark_theme = true
+cursor_theme_name = "Adwaita"
+font_name = "JetBrains Mono 14"
+icon_theme_name = "Adwaita"
+theme_name = "Adwaita-dark"
+
+[commands]
+reboot = ["systemctl", "reboot"]
+poweroff = ["systemctl", "poweroff"]
+
+[appearance]
+greeting_msg = "Welcome"
+
+[widget.clock]
+format = "%a %H:%M"
+resolution = "1s"

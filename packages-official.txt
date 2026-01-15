@@ -18,6 +18,8 @@ efibootmgr
 firefox
 git
 github-cli
+greetd
+greetd-regreet
 grim
 grub
 gst-plugin-pipewire
@@ -27,8 +29,11 @@ hyprland
 hyprlauncher
 hyprlock
 hyprpaper
+icaclient
 iwd
+kate
 kitty
+kvantum
 layer-shell-qt
 libpulse
 libva-nvidia-driver
@@ -66,6 +71,7 @@ smartmontools
 sudo
 swaybg
 system-config-printer
+unzip
 uwsm
 valkey
 vim

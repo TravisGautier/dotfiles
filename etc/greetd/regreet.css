@@ -1,0 +1,136 @@
+/* Timewave2 Theme for ReGreet
+ * Glassmorphism style with green accent (#40FBA4) on dark purple (#1a1a2e)
+ */
+
+/* Main window - transparent to show mpvpaper video */
+window {
+    background-color: transparent;
+}
+
+/* Main container */
+box {
+    background-color: transparent;
+}
+
+/* Login form container - glassmorphism effect */
+.background {
+    background-color: transparent;
+}
+
+/* Entry fields (username/password) */
+entry {
+    background-color: rgba(22, 33, 62, 0.85);
+    border: 1px solid rgba(91, 75, 199, 0.6);
+    border-radius: 12px;
+    color: #ecf0f1;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 14px;
+    padding: 12px 16px;
+    min-height: 20px;
+}
+
+entry:focus {
+    border-color: rgba(64, 251, 164, 0.8);
+    box-shadow: 0 0 8px rgba(64, 251, 164, 0.3);
+}
+
+entry text {
+    color: #ecf0f1;
+}
+
+entry placeholder {
+    color: rgba(236, 240, 241, 0.5);
+}
+
+/* Buttons */
+button {
+    background-color: rgba(26, 26, 46, 0.9);
+    border: 1px solid rgba(91, 75, 199, 0.5);
+    border-radius: 12px;
+    color: #ecf0f1;
+    font-family: "JetBrains Mono", monospace;
+    font-size: 13px;
+    font-weight: bold;
+    padding: 10px 20px;
+    min-height: 20px;
+}
+
+button:hover {
+    background-color: rgba(91, 75, 199, 0.4);
+    border-color: rgba(64, 251, 164, 0.6);
+}
+
+/* Login/submit button - green accent */
+button.suggested-action {
+    background-color: #40FBA4;
+    border: none;
+    color: #1a1a2e;
+}
+
+button.suggested-action:hover {
+    background-color: rgba(64, 251, 164, 0.9);
+}
+
+button.suggested-action:active {
+    background-color: rgba(64, 251, 164, 0.8);
+}
+
+/* Destructive buttons (shutdown) */
+button.destructive-action {
+    background-color: rgba(26, 26, 46, 0.9);
+    border-color: rgba(233, 69, 96, 0.5);
+    color: #e94560;
+}
+
+button.destructive-action:hover {
+    background-color: rgba(233, 69, 96, 0.8);
+    color: #ffffff;
+}
+
+/* Labels */
+label {
+    color: #ecf0f1;
+    font-family: "JetBrains Mono", monospace;
+}
+
+/* User label - green glow */
+label.title {
+    color: #40FBA4;
+    font-size: 22px;
+    font-weight: bold;
+}
+
+/* Dropdown/ComboBox for session selection */
+dropdown,
+combobox {
+    background-color: rgba(26, 26, 46, 0.9);
+    border: 1px solid rgba(91, 75, 199, 0.5);
+    border-radius: 12px;
+    color: #40FBA4;
+    font-family: "JetBrains Mono", monospace;
+    padding: 8px 12px;
+}
+
+dropdown:hover,
+combobox:hover {
+    border-color: rgba(64, 251, 164, 0.6);
+}
+
+/* Dropdown popup */
+popover {
+    background-color: rgba(26, 26, 46, 0.95);
+    border: 1px solid rgba(91, 75, 199, 0.5);
+    border-radius: 12px;
+}
+
+/* Clock widget */
+.clock {
+    color: rgba(236, 240, 241, 0.8);
+    font-family: "JetBrains Mono", monospace;
+    font-size: 16px;
+}
+
+/* Error messages */
+.error {
+    color: #e94560;
+}

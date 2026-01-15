@@ -1,3 +1,4 @@
+icaclient
 mpvpaper
 wlogout
 wlogout-debug
