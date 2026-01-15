@@ -1,6 +1,6 @@
 #!/bin/bash
 VIDEO="/home/travis/.local/share/hypr/lock-video.mp4"
-MONITOR="DP-6"
+MONITOR="DP-3"
 
 # Start video wallpaper (overlay layer - shows through hyprlock transparency)
 mpvpaper --layer overlay -o "no-audio --loop" "$MONITOR" "$VIDEO" &

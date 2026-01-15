@@ -6,6 +6,60 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-01-14
+
+### Lock Scripts Not Synced to Live System
+
+**Problem:** Lock screen broken again - UI not appearing, mouse disappears, but PIN input works.
+
+**Diagnosis:**
+- Previous fixes to `lock.sh` and `lock-with-video.sh` were in dotfiles but never copied to `~/.local/bin/`
+- Live scripts still had `DP-6` instead of `DP-3`
+- Files were also owned by root:root instead of travis:travis
+
+**Fix applied:**
+1. Copied corrected scripts from dotfiles to live system
+2. Fixed ownership to travis:travis
+3. Added mpvpaper wait loop to `lock.sh` (polls `hyprctl layers` until surface ready)
+4. Changed cleanup to `kill -9` for instant video termination on unlock
+
+**Status:** Resolved.
+
+### Hyprlock Monitor Port Fix
+
+**Problem:** Lock screen broken after iGPU disabled - screens don't change visually, mouse disappears, but PIN input still works.
+
+**Diagnosis:**
+- When iGPU was disabled (Jan 12), NVIDIA ports changed from DP-4/DP-6 to DP-1/DP-3
+- hyprland.conf and swaybg were updated, but hyprlock.conf and lock scripts were missed
+- hyprlock was rendering UI to non-existent monitors (DP-4/DP-6)
+
+**Fix applied:**
+1. Updated `hyprlock.conf`: DP-4 → DP-1 (secondary), DP-6 → DP-3 (primary)
+2. Updated `lock.sh`: MAIN_MONITOR="DP-3"
+3. Updated `lock-with-video.sh`: MONITOR="DP-3"
+
+**Status:** Resolved.
+
+### Hyprlock Video Background Fix
+
+**Problem:** After monitor port fix, lock dialog appeared but video background wasn't showing on primary monitor (DP-3). mpvpaper error: "sorry about this but we can't seem to find any output."
+
+**Diagnosis:**
+- Manual test worked: `mpvpaper ... & sleep 1 && hyprlock` showed video correctly
+- Script failed with "can't find any output" error
+- Root cause: **Race condition** - mpvpaper takes time to initialize (connect to Wayland, create EGL context, load video, bind to output). Fixed `sleep 1` wasn't enough time.
+- By the time mpvpaper was ready, hyprlock had already locked the session and outputs were unavailable
+
+**Fix applied:**
+1. Added wait loop using `hyprctl layers` to check when mpvpaper's surface is created
+2. Only proceed to hyprlock after mpvpaper is fully initialized
+3. Added 0.5s buffer after surface detection for rendering to stabilize
+
+**Status:** Resolved.
+
+---
+
 ## 2026-01-13
 
 ### Dolphin Translucency with Kvantum
