@@ -8,6 +8,38 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ## 2026-01-14
 
+### SDDM/Hyprland Login Failure - seatd Not Running
+
+**Problem:** After rebooting from Windows 11, SDDM login to Hyprland failed - session crashed within 1 second, dropping to TTY.
+
+**Diagnosis:**
+- Hyprland crash report showed: `CBackend::create() failed!`
+- Aquamarine (Hyprland's backend) error: `[libseat] Could not connect to socket /run/seatd.sock: No such file or directory`
+- libseat tried seatd first (not running), then fell back to logind
+- logind backend also failed with: `Could not take control of session: Only owner of session may take control`
+- Root cause: `seatd` service was **installed but never enabled** since Jan 10 initial setup
+- `aquamarine` package explicitly depends on `seatd` (`libseat.so`)
+
+**Additional finding - VT race condition:**
+- On previous boot, SDDM allocated Hyprland to VT 3 → worked
+- On this boot, SDDM allocated VT 2 → failed (getty@tty2 conflict)
+- This is a known SDDM bug ([Issue #1844](https://github.com/sddm/sddm/issues/1844)) - SDDM queries logind for free VTs but logind doesn't recognize getty sessions as "active"
+- The `MinimumVT` setting was removed in SDDM v0.20+, so this can't be configured
+
+**Fix applied:**
+1. Enabled seatd service: `systemctl enable --now seatd`
+2. Added travis to seat group: `usermod -a -G seat travis`
+3. Verified `/run/seatd.sock` created with correct permissions (`root:seat`, `srwxrwx---`)
+
+**Status:** Pending verification - reboot required to test fix.
+
+**Sources:**
+- [SDDM VT conflict issue](https://github.com/sddm/sddm/issues/1844)
+- [Hyprland libseat discussion](https://github.com/hyprwm/Hyprland/discussions/8421)
+- [Arch Wiki - SDDM](https://wiki.archlinux.org/title/SDDM)
+
+---
+
 ### Lock Scripts Not Synced to Live System
 
 **Problem:** Lock screen broken again - UI not appearing, mouse disappears, but PIN input works.
