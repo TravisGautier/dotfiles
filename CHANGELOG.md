@@ -28,6 +28,25 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 **Status:** Pending verification - logout/reboot required
 
+### greetd: Fix login dialog appearing on wrong monitor
+
+**Problem:** Login dialog (regreet) appears on secondary monitor (DP-1) while video background plays on primary monitor (DP-3). User wants both on primary with secondary blank.
+
+**Diagnosis:**
+- ReGreet is a GTK layer-shell app that appears on whatever monitor Hyprland considers "active" at startup
+- The greeter's Hyprland config didn't specify which monitor should have initial focus
+- Without explicit configuration, Hyprland's default monitor selection was picking DP-1
+
+**Fix applied:**
+- Added `cursor { default_monitor = DP-3 }` to `/etc/greetd/hyprland.conf`
+- This tells Hyprland to place cursor/focus on DP-3 at startup, making regreet appear there
+
+**Status:** Pending verification - logout/reboot required
+
+**References:**
+- [Hyprland Issue #5803](https://github.com/hyprwm/Hyprland/issues/5803) - Feature request for cursor default_monitor
+- [ReGreet GitHub](https://github.com/rharish101/ReGreet) - Confirms monitor selection is compositor's responsibility
+
 ---
 
 ## 2026-01-14
