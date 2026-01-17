@@ -6,6 +6,30 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-01-16
+
+### greetd: Fix "Hyprland started without start-hyprland" warning
+
+**Problem:** Warning displayed on regreet login screen: "Hyprland was started without start-hyprland. This is highly not recommended unless you are in a debugging environment."
+
+**Diagnosis:**
+- Warning comes from greeter's Hyprland instance, not user session
+- `/etc/greetd/config.toml` was launching Hyprland directly instead of via the recommended `start-hyprland` wrapper
+- User session already correctly uses `start-hyprland` via `/usr/share/wayland-sessions/hyprland.desktop`
+- dmesg showed previous greeter crashes: `Hyprland[972]: segfault ... in libaquamarine.so`
+
+**Fix applied:**
+- Updated `/etc/greetd/config.toml`:
+  - Before: `command = "Hyprland -c /etc/greetd/hyprland.conf"`
+  - After: `command = "start-hyprland -- -c /etc/greetd/hyprland.conf"`
+- The `--` separates start-hyprland args from Hyprland args
+
+**Benefits:** Adds crash recovery and watchdog to greeter (per Hyprland 0.53+ recommendation)
+
+**Status:** Pending verification - logout/reboot required
+
+---
+
 ## 2026-01-14
 
 ### Migration from SDDM to greetd
