@@ -16,6 +16,7 @@ dolphin
 dunst
 efibootmgr
 firefox
+flite
 git
 github-cli
 greetd
@@ -55,6 +56,7 @@ nvidia-open-dkms
 obsidian
 openrgb
 os-prober
+pandoc-cli
 pipewire
 pipewire-alsa
 pipewire-jack
@@ -71,7 +73,11 @@ smartmontools
 sudo
 swaybg
 system-config-printer
+texlive-basic
+texlive-fontsrecommended
+texlive-latexrecommended
 unzip
+usbutils
 uwsm
 valkey
 vim
@@ -92,4 +98,5 @@ xorg-server
 xorg-xinit
 yay
 yay-debug
+zoom
 zram-generator

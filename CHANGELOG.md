@@ -18,6 +18,20 @@ Sleep is broken on AM5/X870 + nvidia-open (see 2026-01-20 investigation). Disabl
 
 Lock screen (5 min) and DPMS (10 min) still active.
 
+### Fix Slow Shutdown
+
+**Problem:** System hung for ~90 seconds during shutdown before eventually completing.
+
+**Diagnosis:** Journal showed `xdg-document-portal.service` timing out on SIGTERM - systemd waited the full 90-second default timeout before sending SIGKILL. The flatpak document portal had a stuck FUSE mount.
+
+**Fix:** Created systemd drop-in to reduce timeout:
+- `/etc/systemd/user/xdg-document-portal.service.d/timeout.conf` with `TimeoutStopSec=10`
+
+### Packages
+
+- Added: flite, pandoc-cli, texlive-basic, texlive-fontsrecommended, texlive-latexrecommended, usbutils
+- Added (AUR): zoom
+
 ---
 
 ## 2026-01-20

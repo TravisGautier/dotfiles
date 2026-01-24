@@ -4,3 +4,4 @@ wlogout
 wlogout-debug
 yay
 yay-debug
+zoom
