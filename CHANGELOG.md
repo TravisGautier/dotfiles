@@ -6,6 +6,75 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-01-24
+
+### Disable Sleep/Suspend
+
+Sleep is broken on AM5/X870 + nvidia-open (see 2026-01-20 investigation). Disabled all automatic and manual sleep triggers until upstream fixes are available.
+
+**Changes:**
+- Commented out suspend listener in `~/.config/hypr/hypridle.conf` (was 15-minute idle trigger)
+- Created `/etc/systemd/logind.conf.d/no-suspend.conf` to ignore suspend/hibernate keys
+
+Lock screen (5 min) and DPMS (10 min) still active.
+
+---
+
+## 2026-01-20
+
+### Suspend/Sleep Investigation - Continued Research
+
+**Problem:** System still fails to suspend properly - RGB lights turn off, fans stay running, no keyboard/mouse wake response, requires hard power off.
+
+**System State:**
+- BIOS: 1804 (Nov 2025) - latest available, no S3/sleep fixes in changelog
+- Kernel: 6.18.5-arch1-1
+- Driver: nvidia-open-dkms 590.48.01
+- Sleep mode: `mem_sleep_default=deep` applied, `s2idle [deep]` confirmed
+
+**Research Findings:**
+
+1. **nvidia-open is now the correct/recommended driver**
+   - Arch Linux switched `nvidia-dkms` to install open modules by default ([Phoronix](https://www.phoronix.com/news/Arch-LInux-NVIDIA-Open-Default))
+   - NVIDIA officially recommends open modules for Turing+ GPUs ([NVIDIA Blog](https://developer.nvidia.com/blog/nvidia-transitions-fully-towards-open-source-gpu-kernel-modules/))
+   - Performance is identical to proprietary (~1% difference in benchmarks)
+   - Blackwell GPUs **require** open modules
+
+2. **Open modules have known power management limitations**
+   - Per [GitHub Discussion #457](https://github.com/NVIDIA/open-gpu-kernel-modules/discussions/457): "missing features being addressed (most notably power management)"
+   - The `NVreg_EnableGpuFirmware=0` workaround only works with proprietary drivers
+   - This is being actively worked on by NVIDIA
+
+3. **AM5/X870 motherboard firmware is the primary suspect**
+   - [Level1Techs](https://forum.level1techs.com/t/am5-linux-triggering-suspected-firmware-bug-with-s3-sleep/229940) documents S3 bugs affecting multiple AM5 vendors
+   - Manufacturers stopped fixing S3 because Windows uses Modern Standby (S0ix) by default
+   - `asus_wmi: failed to register LPS0 sleep handler` confirms board's S0ix is also broken
+   - Similar reports on [CachyOS Forum](https://discuss.cachyos.org/t/suspend-to-ram-s3-fails-immediate-wake-or-hang-during-suspend-x870-aorus-elite-wifi-cachyos/14366) for X870 boards
+
+**BIOS Settings to Try:**
+- **Sleep State Mode**: Look for "Linux" vs "Windows 10" option (S3 vs Modern Standby)
+- **ErP Ready**: Try disabled (can prevent proper S3 power states)
+- **Monitoring Software Reboot Workaround**: Enable in AI Tweaker ([ROG Forum](https://rog-forum.asus.com/t5/amd-800-series/rog-strix-x870-f-problems-waking-from-sleep-mode/td-p/1094463))
+
+**Alternative Kernel Parameters to Test:**
+```
+acpi_sleep=s3_bios,s3_mode
+acpi_osi=Linux
+acpi.ec_no_wakeup=1
+```
+
+**Status:** Investigation complete. Root cause identified as combination of:
+1. AM5/X870 motherboard firmware bugs (vendor issue, not fixable by user)
+2. nvidia-open power management limitations (being worked on upstream)
+
+No immediate fix available. Options are:
+- Wait for NVIDIA open driver power management improvements
+- Wait for ASUS BIOS update addressing S3 (unlikely given Modern Standby focus)
+- Try proprietary nvidia-dkms + `NVreg_EnableGpuFirmware=0` as workaround (goes against NVIDIA/Arch recommendations)
+- Try linux-lts kernel (6.6.x) which may have better suspend support
+
+---
+
 ## 2026-01-16
 
 ### greetd: Fix "Hyprland started without start-hyprland" warning
