@@ -1,7 +1,6 @@
 icaclient
 mpvpaper
 wlogout
-wlogout-debug
 yay
 yay-debug
 zoom

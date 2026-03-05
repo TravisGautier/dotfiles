@@ -9,6 +9,7 @@ cjson
 cmake
 cups
 cups-pk-helper
+deno
 dkms
 docker
 docker-compose
@@ -50,12 +51,17 @@ networkmanager
 ninja
 nmap
 nodejs
+noto-fonts
+noto-fonts-cjk
+noto-fonts-emoji
+noto-fonts-extra
 npm
 ntfs-3g
 nvidia-open-dkms
 obsidian
 openrgb
 os-prober
+pacman-contrib
 pandoc-cli
 pipewire
 pipewire-alsa
@@ -76,6 +82,11 @@ system-config-printer
 texlive-basic
 texlive-fontsrecommended
 texlive-latexrecommended
+ttf-hannom
+ttf-indic-otf
+ttf-jetbrains-mono-nerd
+ttf-khmer
+ttf-tibetan-machine
 unzip
 usbutils
 uwsm
@@ -90,6 +101,7 @@ wireless_tools
 wireplumber
 wl-clipboard
 wlogout
+woff2-font-awesome
 wofi
 wpa_supplicant
 xdg-desktop-portal-hyprland
@@ -98,5 +110,6 @@ xorg-server
 xorg-xinit
 yay
 yay-debug
+yt-dlp
 zoom
 zram-generator

@@ -6,6 +6,15 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-03-04
+
+### Packages
+
+- Added: deno, noto-fonts, noto-fonts-cjk, noto-fonts-emoji, noto-fonts-extra, pacman-contrib, ttf-hannom, ttf-indic-otf, ttf-jetbrains-mono-nerd, ttf-khmer, ttf-tibetan-machine, woff2-font-awesome, yt-dlp
+- Removed: wlogout-debug
+
+---
+
 ## 2026-01-24
 
 ### Disable Sleep/Suspend
