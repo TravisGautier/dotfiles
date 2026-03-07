@@ -141,6 +141,9 @@ ex ()
 export COLORTERM=truecolor
 export TERM=xterm-256color
 
+# Enable Claude Code prompt suggestions (auto-suggest)
+export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=1
+
 # pnpm
 export PNPM_HOME="/home/travis/.local/share/pnpm"
 case ":$PATH:" in

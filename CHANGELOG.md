@@ -6,6 +6,14 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-03-07
+
+### Shell
+
+- Added `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=1` env var to bashrc to enable prompt suggestions in Claude Code (bypasses server-side feature flag)
+
+---
+
 ## 2026-03-04
 
 ### Packages
