@@ -6,6 +6,14 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-03-11
+
+### Shell
+
+- Added `alias claude='sudo -E /usr/bin/claude'` to bashrc so env vars (prompt suggestions, COLORTERM) pass through sudo
+
+---
+
 ## 2026-03-07
 
 ### Shell

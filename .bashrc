@@ -141,8 +141,9 @@ ex ()
 export COLORTERM=truecolor
 export TERM=xterm-256color
 
-# Enable Claude Code prompt suggestions (auto-suggest)
+# Claude Code: preserve env through sudo (needed for prompt suggestions, COLORTERM, etc.)
 export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=1
+alias claude='sudo -E /usr/bin/claude'
 
 # pnpm
 export PNPM_HOME="/home/travis/.local/share/pnpm"
