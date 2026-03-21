@@ -6,6 +6,14 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-03-21
+
+### Shell
+
+- Fixed `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION` value from `1` to `true` — Claude Code expects string booleans, not numeric; this broke prompt suggestions silently after an update
+
+---
+
 ## 2026-03-11
 
 ### Shell

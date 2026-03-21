@@ -142,7 +142,7 @@ export COLORTERM=truecolor
 export TERM=xterm-256color
 
 # Claude Code: preserve env through sudo (needed for prompt suggestions, COLORTERM, etc.)
-export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=1
+export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=true
 alias claude='sudo -E /usr/bin/claude'
 
 # pnpm
