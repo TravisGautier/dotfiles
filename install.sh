@@ -13,7 +13,7 @@ echo "Target: $HOME_DIR"
 echo
 
 # Symlink shell dotfiles
-echo "[1/4] Linking shell dotfiles..."
+echo "[1/5] Linking shell dotfiles..."
 for file in .bashrc .bash_profile .bash_logout .zshrc .zshenv .profile .gitconfig .nanorc; do
     if [ -f "$DOTFILES_DIR/$file" ]; then
         ln -sf "$DOTFILES_DIR/$file" "$HOME_DIR/$file"
@@ -22,7 +22,7 @@ for file in .bashrc .bash_profile .bash_logout .zshrc .zshenv .profile .gitconfi
 done
 
 # Symlink config directories
-echo "[2/4] Linking config directories..."
+echo "[2/5] Linking config directories..."
 mkdir -p "$HOME_DIR/.config"
 for dir in "$DOTFILES_DIR/.config"/*/; do
     dirname=$(basename "$dir")
@@ -30,8 +30,20 @@ for dir in "$DOTFILES_DIR/.config"/*/; do
     echo "  Linked: .config/$dirname"
 done
 
+# Symlink local bin scripts
+echo "[3/5] Linking local bin scripts..."
+mkdir -p "$HOME_DIR/.local/bin"
+for script in "$DOTFILES_DIR/.local/bin"/*; do
+    if [ -f "$script" ]; then
+        scriptname=$(basename "$script")
+        ln -sf "$script" "$HOME_DIR/.local/bin/$scriptname"
+        chmod +x "$HOME_DIR/.local/bin/$scriptname"
+        echo "  Linked: .local/bin/$scriptname"
+    fi
+done
+
 # Copy system configs (requires sudo)
-echo "[3/4] System configs (/etc/)..."
+echo "[4/5] System configs (/etc/)..."
 if [ -d "$DOTFILES_DIR/etc" ]; then
     echo "  Found etc/ - these require sudo to install:"
     for item in "$DOTFILES_DIR/etc"/*/; do
@@ -46,7 +58,7 @@ else
 fi
 
 # Install packages
-echo "[4/4] Package installation..."
+echo "[5/5] Package installation..."
 echo "  To install official packages:"
 echo "    sudo pacman -S --needed - < $DOTFILES_DIR/packages-official.txt"
 echo "  To install AUR packages (requires yay):"

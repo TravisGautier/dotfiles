@@ -47,3 +47,39 @@ window#waybar {
 #tray > .passive {
     -gtk-icon-effect: dim;
 }
+
+/* Stream/Recording indicator */
+#custom-stream {
+    padding: 0 12px;
+    margin: 4px 6px;
+    border-radius: 12px;
+    font-weight: bold;
+    font-size: 12px;
+}
+
+#custom-stream.live {
+    background-color: #f7768e;
+    color: #1a1b26;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+#custom-stream.rec {
+    background-color: #ff9e64;
+    color: #1a1b26;
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+#custom-stream.stream {
+    background-color: #7aa2f7;
+    color: #1a1b26;
+}
+
+#custom-stream.off {
+    padding: 0;
+    margin: 0;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1.0; }
+    50% { opacity: 0.6; }
+}

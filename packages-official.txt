@@ -50,6 +50,7 @@ network-manager-applet
 networkmanager
 ninja
 nmap
+noise-suppression-for-voice
 nodejs
 noto-fonts
 noto-fonts-cjk
@@ -58,6 +59,7 @@ noto-fonts-extra
 npm
 ntfs-3g
 nvidia-open-dkms
+obs-studio
 obsidian
 openrgb
 os-prober
@@ -91,8 +93,11 @@ unzip
 usbutils
 uwsm
 valkey
+v4l2loopback-dkms
+v4l-utils
 vim
 waybar
+wf-recorder
 weston
 wev
 wget

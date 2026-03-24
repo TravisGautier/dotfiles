@@ -1,7 +1,7 @@
 {
     "layer": "top",
     "position": "top",
-    "height": 30,
+    "height": 34,
     "spacing": 4,
 
     "modules-left": [
@@ -12,12 +12,20 @@
         "clock"
     ],
     "modules-right": [
+        "custom/stream",
         "network",
         "pulseaudio",
         "cpu",
         "memory",
         "tray"
     ],
+
+    "custom/stream": {
+        "exec": "if pgrep -x obs | grep -q . && [ -f /tmp/stream-mode-active ]; then echo '{\"text\": \"● LIVE\", \"class\": \"live\"}'; elif [ -f /tmp/quick-record.pid ] && kill -0 $(cat /tmp/quick-record.pid 2>/dev/null) 2>/dev/null; then echo '{\"text\": \"● REC\", \"class\": \"rec\"}'; elif [ -f /tmp/stream-mode-active ]; then echo '{\"text\": \"● STREAM\", \"class\": \"stream\"}'; else echo '{\"text\": \"\", \"class\": \"off\"}'; fi",
+        "return-type": "json",
+        "interval": 2,
+        "signal": 1
+    },
 
     "hyprland/workspaces": {
         "format": "{id}",
@@ -34,25 +42,25 @@
     },
 
     "network": {
-        "format-wifi": "{essid} ({signalStrength}%)",
-        "format-ethernet": "{ifname}",
-        "format-disconnected": "Disconnected",
+        "format-wifi": "  {essid} ({signalStrength}%)",
+        "format-ethernet": "󰈀 {ifname}",
+        "format-disconnected": "󰖪 Disconnected",
         "tooltip-format": "{ifname}: {ipaddr}",
         "on-click": "nm-connection-editor"
     },
 
     "pulseaudio": {
-        "format": "Vol {volume}%",
-        "format-muted": "Muted",
+        "format": " {volume}%",
+        "format-muted": "󰝟 Muted",
         "on-click": "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"
     },
 
     "cpu": {
-        "format": "CPU {usage}%"
+        "format": " {usage}%"
     },
 
     "memory": {
-        "format": "Mem {}%"
+        "format": "󰍛 {}%"
     },
 
     "tray": {

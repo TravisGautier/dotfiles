@@ -6,6 +6,53 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-03-23
+
+### Streaming & Recording Setup
+
+Full production setup for YouTube recording and livestreaming Claude Code / vibecoding sessions.
+
+**Packages installed:**
+- obs-studio, wf-recorder, v4l2loopback-dkms, v4l-utils (official)
+- obs-pipewire-audio-capture (AUR)
+- noise-suppression-for-voice (RNNoise LADSPA plugin)
+
+**New keybindings (hyprland.conf):**
+- SUPER+F9: Stream mode toggle (font size, gaps, notifications, waybar indicator)
+- SUPER+F10: Quick screen recording via wf-recorder with NVENC
+- Print: Full screenshot to ~/Pictures/Screenshots/
+- SUPER+Print: Region screenshot to clipboard
+
+**New scripts (.local/bin/):**
+- `stream-toggle.sh` — toggles kitty font 11→14pt, solid background, tighter gaps, pauses dunst, shows waybar indicator
+- `quick-record.sh` — toggles wf-recorder with h264_nvenc hardware encoding
+
+**Waybar:**
+- Added custom/stream module with LIVE/REC/STREAM indicator (pulsing red/orange/blue pill)
+- Added Nerd Font icons to all modules (network, volume, cpu, memory)
+- Height 30→34px for video readability
+
+**Kitty:**
+- Added `allow_remote_control yes` and `listen_on unix:/tmp/kitty-socket` for stream mode switching
+- Added stream.conf documentation file
+
+**Hyprland:**
+- border_size 2→3 for video visibility
+- OBS window rules: auto workspace 9, projector windows float
+
+**Audio:**
+- PipeWire filter chain: RNNoise noise suppression creates "Clean Mic" virtual source for OBS
+
+**Dotfiles:**
+- install.sh now symlinks .local/bin/ scripts (step 3/5)
+- Updated packages-official.txt (+5) and packages-aur.txt (+1)
+
+### Shell
+
+- Synced .zshrc: `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=1` (live system value)
+
+---
+
 ## 2026-03-21
 
 ### Shell

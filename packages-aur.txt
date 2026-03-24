@@ -1,5 +1,6 @@
 icaclient
 mpvpaper
+obs-pipewire-audio-capture
 wlogout
 yay
 yay-debug
