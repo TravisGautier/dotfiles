@@ -6,6 +6,36 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-03-31
+
+### Investigation: XDPH Greeter Crash
+
+**Problem:** Login screen crashed — xdg-desktop-portal-hyprland segfaulted during greetd session teardown, greetd reported "greeter exited without creating a session," system shut down.
+
+**Diagnosis:**
+- `xdg-desktop-portal-hyprland` (PID 1064, UID 959/greeter) hit SIGSEGV in `wl_proxy_marshal_flags` (`libwayland-client.so.0`)
+- Crash happens during `exit()` cleanup — XDPH tries to destroy Wayland proxies after Hyprland compositor is already gone
+- Hyprland itself also segfaults in `libaquamarine` DRM disconnect during the same exit path
+- Known upstream bug: [hyprwm/xdg-desktop-portal-hyprland#330](https://github.com/hyprwm/xdg-desktop-portal-hyprland/issues/330) — open, no fix merged
+- Crash observed on both Mar 30 and Mar 31 boots
+
+**Trigger sequence:**
+1. greetd launches Hyprland greeter → regreet (GTK4) activates XDPH via D-Bus
+2. `regreet; hyprctl dispatch exit` fires → Hyprland shuts down
+3. XDPH cleanup sends protocol messages to dead compositor → segfault
+
+**Affected versions:**
+- xdg-desktop-portal-hyprland 1.3.11-3
+- wayland 1.24.0-1
+- hyprland 0.54.2-2
+- greetd 0.10.3-1, greetd-regreet 0.2.0-1
+
+**Fix (not yet applied):** Add `env = GDK_DEBUG,no-portals` to `/etc/greetd/hyprland.conf` — prevents GTK4/regreet from activating XDPH in the greeter session. Alternative: change exec-once to `regreet; systemctl --user stop xdg-desktop-portal-hyprland; hyprctl dispatch exit`.
+
+**Status:** Researched, fix deferred. Crash is cosmetic in greeter context (happens after session handoff) but can cause login failure when timing is bad.
+
+---
+
 ## 2026-03-23
 
 ### Streaming & Recording Setup
