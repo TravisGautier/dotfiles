@@ -4,6 +4,8 @@
 
 [[ $- != *i* ]] && return
 
+export BROWSER=firefox
+
 colors() {
 	local fgc bgc vals seq0
 

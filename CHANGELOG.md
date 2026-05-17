@@ -6,6 +6,29 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-05-17
+
+### Shell: BROWSER env var
+
+- Added `export BROWSER=firefox` to `.bashrc` so Claude Code's `/login` and other URL-opening tools auto-launch Firefox (opens a new tab if Firefox is already running, via Firefox's built-in remoting). Previously `$BROWSER` was unset and xdg-open's fallback chain wasn't picking up Firefox reliably under Hyprland.
+
+### Shell: bashrc Claude prompt-suggestion line reconciled
+
+- Live `.bashrc` had drifted to `CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=1` (no comment). Repo had the canonical `=true` with a comment explaining the `sudo -E` env-preservation reason. Updated live to match repo.
+
+### Hyprland: keybinds + pseudotile note
+
+- Removed obsolete `pseudotile = true` option from dwindle block (removed in Hyprland 0.55; `pseudo` is now a per-window state toggled via the `pseudo` dispatcher).
+- Changed `$mainMod + J` from `togglesplit` to `layoutmsg, togglesplit` (newer Hyprland dispatcher syntax).
+- Added `$mainMod + G` → launch Steam.
+- Added fabled10x RGB mode keybinds: `F1` → rest, `F2` → focus, `F3` → build (calls `~/.local/bin/fabled10x`).
+
+### Waybar: style.css cleanup
+
+- Merged two separate `0%` and `100%` keyframe rules into a single `0%, 100% { opacity: 1.0; }` selector. Cosmetic; no behavior change.
+
+---
+
 ## 2026-03-31
 
 ### Investigation: XDPH Greeter Crash
