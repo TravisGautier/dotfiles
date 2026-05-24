@@ -6,6 +6,60 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-05-24
+
+### Investigation: OOM cascade forced hard shutdown
+
+**Problem:** Around 00:48 CDT on 2026-05-24, multiple concurrent `claude` sessions (running as root via `sudo -E /usr/bin/claude`) combined with Node/npm/tsc/jest/Firefox/Docker exhausted RAM. The kernel OOM-killer fired repeatedly and eventually reaped the user's `kitty-*.scope`, leaving the desktop unresponsive. Travis hard-power-cycled and booted from an Arch USB before re-entering the installed system.
+
+**Diagnosis:**
+- Hardware healthy: both NVMes pass SMART (nvme0n1 at 2% wear, 0 media errors; 21 unsafe shutdowns logged historically). Btrfs reports zero device/corruption/scrub errors.
+- Root cause was layered: zram-only swap (no on-disk overflow), no userspace OOM daemon, `user-1000.slice` had `MemoryMax=infinity` (unbounded), no per-claude memory grouping, claude was aliased to `sudo -E /usr/bin/claude` (uid 0 — but cgroup still under user.slice).
+- partymasters package.json ships `NODE_OPTIONS=--max-old-space-size=8192` for typecheck and `4096` for build/test. A worktree-claude can spike to ~12–16 GiB. The 75-GB-VSZ processes in the OOM log were jest/tsc workers, not claude itself.
+- Travis runs up to 8 concurrent worktree-claudes; 8 × 16 GiB exceeds the 62 GiB of RAM by design.
+
+**Status:** Resolved. Layered hardening applied (live; survives reboot):
+
+### Shell: claude wrapper function
+
+- Replaced `alias claude='sudo -E /usr/bin/claude'` with a function that wraps each invocation in a transient systemd scope under a dedicated `claude.slice`, owned by the user-1000 systemd manager (`user@1000.service`). Each scope is individually targetable by `systemd-oomd`, so a runaway claude can be killed in isolation without taking down the others or the desktop session.
+- Final form:
+  ```bash
+  claude() {
+    systemd-run --user --scope --slice=claude.slice --quiet -- sudo -E /usr/bin/claude "$@"
+  }
+  ```
+- Important architectural detail (verified empirically via cgroup probe): `sudo systemd-run --scope` (which I initially proposed) creates the scope in the **system manager**, landing it at `/system.slice/claude.slice/...` — outside `user-1000.slice`, so the user-slice cap would not apply. The correct form is `systemd-run --user --scope` first, then `sudo` inside the scope. Arch's `/etc/pam.d/sudo` does not load `pam_systemd`, so sudo doesn't reparent cgroups; the elevated process stays in the user-manager-owned scope.
+
+### Waybar: style.css formatting
+
+- Live had two separate `0% { opacity: 1.0; }` and `100% { opacity: 1.0; }` rules; repo had the merged `0%, 100% { opacity: 1.0; }` form. Pushed live → repo to capture current running state. (Cosmetic only; CSS-equivalent.)
+
+### System hardening (out-of-scope for this repo — documented for reference)
+
+These changes are in `/etc/` and not tracked here, but together with the bashrc wrapper they form the full defense:
+
+- **Swap**: created `@swap` subvolume on btrfs root, 64 GiB swapfile via `btrfs filesystem mkswapfile` (handles NOCOW + preallocation), `swapon -p 10`. zram remains prio 100. Total swap now 94 GiB (30 zram + 64 disk).
+- **sysctl**: `vm.swappiness=150` for aggressive zram use (kernel docs / Pop!_OS recommendation for zram-hybrid setups; priority ordering already protects disk swap from being touched until zram is exhausted).
+- **systemd-oomd**: enabled with `SwapUsedLimit=90%`, `DefaultMemoryPressureLimit=60%`, `DefaultMemoryPressureDurationSec=20s`. Monitors both `user-1000.slice` and `user-1000.slice/user@1000.service/claude.slice`.
+- **user-1000.slice cap** (drop-in at `/etc/systemd/system/user-.slice.d/50-memory.conf`): `MemoryHigh=50G`, `MemoryMax=56G`, `ManagedOOM*=kill`. Reserves ~6 GiB for system slice.
+- **claude.slice cap** (user-level drop-in at `/etc/systemd/user/claude.slice.d/limits.conf`): `MemoryMax=50G`, `MemoryHigh=44G`, `MemorySwapMax=48G`, `ManagedOOM*=kill`. Per-scope cap intentionally omitted — partymasters jest/tsc workers can legitimately need 20+ GiB; oomd kills worst PSI offender instead.
+- **OOMScoreAdjust drop-ins**: `systemd-logind` → `-900` (do not kill — owns the seat), `user@.service` → `-100` (protects per-user systemd manager + inherits to descendants).
+- **systemd-oomd known bug #33486 mitigation**: `ManagedOOMMemoryPressure=kill` can silently no-op; pair with `ManagedOOMSwap=kill` on every target slice. Both are set.
+
+### Btrfs hygiene
+
+- Installed `snapper`, `snap-pac`, `btrfsmaintenance`, `compsize`, `stress-ng`.
+- Created snapper configs for `/` and `/home`. Retention: 0h / 7d / 4w / 3m, NUMBER_LIMIT=20. Enabled `snapper-timeline.timer`, `snapper-cleanup.timer`, `snapper-boot.timer`. `snap-pac` provides pre/post-pacman snapshots automatically.
+- Deleted 6 of 8 ad-hoc pre-update snapshots (Feb–Apr 2026); kept the 2 most recent (May 2 + May 13) for rollback safety until snapper accumulates its own.
+- `/etc/default/btrfsmaintenance`: `BTRFS_BALANCE_DUSAGE="5 10 30 50"`, `BTRFS_TRIM_PERIOD="weekly"` (was "none"). Enabled `btrfs-balance.timer` (weekly), `btrfs-scrub.timer` (monthly), `btrfs-trim.timer` (weekly). Defrag intentionally off (interferes with snapshot extent sharing).
+
+### Packages: refresh
+
+- Updated `packages-official.txt` and `packages-aur.txt`. New entries beyond today's installs reflect pre-existing drift since the last sync.
+
+---
+
 ## 2026-05-17
 
 ### Shell: BROWSER env var

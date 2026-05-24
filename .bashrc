@@ -145,7 +145,9 @@ export TERM=xterm-256color
 
 # Claude Code: preserve env through sudo (needed for prompt suggestions, COLORTERM, etc.)
 export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=true
-alias claude='sudo -E /usr/bin/claude'
+claude() {
+  systemd-run --user --scope --slice=claude.slice --quiet -- sudo -E /usr/bin/claude "$@"
+}
 
 # pnpm
 export PNPM_HOME="/home/travis/.local/share/pnpm"

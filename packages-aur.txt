@@ -1,6 +1,7 @@
 icaclient
 mpvpaper
 obs-pipewire-audio-capture
+webkit2gtk
 wlogout
 yay
 yay-debug
