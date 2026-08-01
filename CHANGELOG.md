@@ -6,6 +6,37 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-07-31
+
+### Investigation: "Screensaver never clears off AOC monitor after unlock" — solved, no reboot needed
+
+**Problem:** After unlocking, DP-3 (AOC 4K) sometimes stayed on the lock-video "screensaver" while DP-1 worked normally; only known recourse was a reboot. Frequency went from ~monthly to multiple times/week after the 2026-07-26 update (hyprland 0.56.0, hyprlock 0.9.6, nvidia 610.43.03, mpvpaper 1.9).
+
+**Diagnosis (performed live on a broken session):**
+- Both lock scripts start an mpvpaper video overlay on DP-3, run hyprlock, and killed mpvpaper only after hyprlock exited.
+- hyprlock 0.9.6 intermittently deadlocks on exit after a *successful* unlock (all 3 threads in futex waits; logind `LockedHint` already `no`). Correlates with unlock racing the DPMS-on modeset — Hyprland log showed both monitors releasing/re-acquiring CRTCs at wake.
+- Because hyprlock never exits, the cleanup `kill $MPVPAPER_PID` never runs → orphaned mpvpaper overlay covers DP-3 forever. Desktop underneath is fine. Recovery = kill mpvpaper + `kill -9` hyprlock. **A reboot was never necessary.**
+
+**Fixes applied:**
+- `lock.sh` + `lock-with-video.sh`: cleanup moved to `trap ... EXIT`; added unlock watchdog that polls `loginctl show-session $XDG_SESSION_ID -p LockedHint` and `kill -9`s hyprlock if the hint goes yes→no but the process is still alive 5s later (fail-safe: inert if the hint is never set).
+- New `~/.local/bin/unstick-lockscreen.sh` panic button bound to **SUPER+SHIFT+L**: `pkill -x mpvpaper; pkill -9 -x hyprlock; hyprctl dispatch dpms on`.
+- `hyprlock.conf`: `animations { animation = fadeOut, 0 }` — the exit fade waiting on frame callbacks during the DPMS-on modeset is the likely deadlock site.
+
+### lock.sh: removed 10-minute suspend timer
+
+Re-investigated whether suspend was fixed since the 2026-01-20 audit. It was not — it got worse:
+- [open-gpu-kernel-modules #1117](https://github.com/NVIDIA/open-gpu-kernel-modules/issues/1117): RTX 50-series (Blackwell) s2idle resume hangs on kernel 7.x (works on 6.17); still open as of April 2026. We run kernel 7.1.5 + 5070 Ti.
+- Deep/S3 remains firmware-broken on AM5/X870.
+- Journal shows a Jun 01 2026 suspend attempt aborted at `xhci_pci_suspend returns -110` (USB controller timeout) — likely triggered by this very lock.sh timer and likely one of the past forced power-offs.
+- Local misconfig: `nvidia-suspend/resume/hibernate.service` are disabled while `NVreg_PreserveVideoMemoryAllocations=1` is set; that combo breaks resume even when the platform cooperates. If suspend is ever revisited (after #1117), enable those services too.
+
+**Status:** Fixes live (`hyprctl reload` done). Pending real-world verification on next few lock/unlock cycles — check `hyprctl layers` for stale mpvpaper after unlock, `/tmp/idle-events.log` for history.
+
+### Sync: bashrc + package lists
+
+- `.bashrc`: synced live additions — `CLAUDE_CODE_TMPDIR=~/.cache/claude-tmp`, `~/.local/bin` on PATH, and the commented-out 2026-05-30 streaming-incident mitigations (reverted 2026-06-01).
+- Package lists refreshed. New official: efitools, mokutil, sbctl, sbsigntools, zip (Secure Boot tooling). New AUR: shim-signed, mpvpaper-debug, webkit2gtk-debug, libsoup. Removed: steam, yay-debug.
+
 ## 2026-05-24
 
 ### Investigation: OOM cascade forced hard shutdown
