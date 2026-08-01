@@ -145,6 +145,12 @@ export TERM=xterm-256color
 
 # Claude Code: preserve env through sudo (needed for prompt suggestions, COLORTERM, etc.)
 export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=true
+# 2026-05-30 mitigation reverted 2026-06-01 — the underlying issue resolved on
+# client 2.1.158 + Opus 4.7 (see ~/.claude/incident-claude-code-streaming-tool-exec-2026-05-30.md).
+# DISABLE_EXPERIMENTAL_BETAS=1 was gating Remote Control off; removed.
+# DISABLE_NONESSENTIAL_TRAFFIC=1 never actually blocked the flag fetch; removed.
+# export CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC=1
+# export CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS=1
 claude() {
   systemd-run --user --scope --slice=claude.slice --quiet -- sudo -E /usr/bin/claude "$@"
 }
@@ -156,3 +162,7 @@ case ":$PATH:" in
   *) export PATH="$PNPM_HOME:$PATH" ;;
 esac
 # pnpm end
+export CLAUDE_CODE_TMPDIR="$HOME/.cache/claude-tmp"
+
+# claudeloop
+export PATH="$HOME/.local/bin:$PATH"

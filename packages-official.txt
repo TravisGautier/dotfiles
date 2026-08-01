@@ -19,6 +19,7 @@ docker-compose
 dolphin
 dunst
 efibootmgr
+efitools
 exfatprogs
 firefox
 flite
@@ -48,6 +49,7 @@ linux
 linux-firmware
 linux-headers
 meson
+mokutil
 mold
 mpv
 mpvpaper
@@ -85,14 +87,16 @@ qt5-wayland
 qt6-multimedia-gstreamer
 qt6-wayland
 rsync
+sbctl
+sbsigntools
 sccache
 sddm
 shellcheck
+shim-signed
 slurp
 smartmontools
 snap-pac
 snapper
-steam
 stress-ng
 sudo
 swaybg
@@ -129,8 +133,8 @@ xdg-utils
 xorg-server
 xorg-xinit
 yay
-yay-debug
 yq
 yt-dlp
+zip
 zoom
 zram-generator

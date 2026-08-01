@@ -1,8 +1,11 @@
 icaclient
+libsoup
 mpvpaper
+mpvpaper-debug
 obs-pipewire-audio-capture
+shim-signed
 webkit2gtk
+webkit2gtk-debug
 wlogout
 yay
-yay-debug
 zoom
