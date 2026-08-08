@@ -1,10 +1,15 @@
 #!/bin/bash
 # Manual video lockscreen (Super+L).
-# Hardened 2026-07-31: hyprlock 0.9.6 can deadlock on exit after unlock,
-# which used to orphan the mpvpaper overlay on DP-3 ("stuck screensaver",
-# see dotfiles CHANGELOG.md). Cleanup now runs via trap, and a watchdog
-# kills hyprlock if the session unlocks (logind LockedHint yes->no) but
-# the process never exits.
+# Reworked 2026-08-08: hyprlock 0.9.6 can deadlock on exit after unlock
+# (hyprlock#791), which used to orphan the mpvpaper overlay on DP-3
+# ("stuck screensaver") and stack duplicate lock instances. Two defenses:
+#   1. Single-instance guard below — never stack a second hyprlock.
+#   2. hypridle's on_unlock_cmd runs unlock-cleanup.sh (compositor-driven
+#      via hyprland-lock-notify-v1) to reap a deadlocked hyprlock and any
+#      leftover mpvpaper within seconds of a real unlock.
+# The old logind LockedHint watchdog was removed: hyprlock never sets
+# LockedHint, so it could never fire. Manual fallback stays on
+# Super+Shift+L (unstick-lockscreen.sh).
 # Suspend timer removed 2026-07-31: suspend is still broken on this stack —
 # RTX 50 s2idle regression on kernel 7.x (open-gpu-kernel-modules #1117),
 # AM5/X870 S3 firmware bugs, and a June 2026 attempt died on
@@ -13,11 +18,22 @@
 
 VIDEO="/home/travis/.local/share/hypr/lock-video.mp4"
 MAIN_MONITOR="DP-3"
+STATE=/tmp/hypr-lock-state
+LOG=/home/travis/.local/bin/idle-log.sh
 
-SESSION_ID="${XDG_SESSION_ID:-$(loginctl list-sessions --no-legend | awk '$4 == "seat0" {print $1; exit}')}"
+if pgrep -x hyprlock >/dev/null; then
+    if [ "$(cat "$STATE" 2>/dev/null)" = "locked" ]; then
+        "$LOG" "LOCK_SKIP_ALREADY_LOCKED"
+        exit 0
+    fi
+    "$LOG" "LOCK_REAP_STALE"
+    pkill -9 -x hyprlock
+    pkill -f 'mpvpaper.*lock-video'
+    sleep 0.5
+fi
 
 cleanup() {
-    kill "$MPVPAPER_PID" "$DPMS_PID" "$WATCHDOG_PID" 2>/dev/null
+    kill "$MPVPAPER_PID" "$DPMS_PID" 2>/dev/null
     hyprctl dispatch dpms on
 }
 trap cleanup EXIT
@@ -42,23 +58,5 @@ DPMS_PID=$!
 hyprlock &
 HYPRLOCK_PID=$!
 
-# Watchdog: fail-safe — only fires after LockedHint has been observed "yes"
-# and then flips to "no" while hyprlock is still alive 5s later.
-(
-    seen_locked=0
-    while kill -0 "$HYPRLOCK_PID" 2>/dev/null; do
-        hint=$(loginctl show-session "$SESSION_ID" -p LockedHint --value 2>/dev/null)
-        if [ "$hint" = "yes" ]; then
-            seen_locked=1
-        elif [ "$hint" = "no" ] && [ "$seen_locked" -eq 1 ]; then
-            sleep 5
-            kill -0 "$HYPRLOCK_PID" 2>/dev/null && kill -9 "$HYPRLOCK_PID" 2>/dev/null
-            exit 0
-        fi
-        sleep 2
-    done
-) &
-WATCHDOG_PID=$!
-
-# Blocks until unlock (or until the watchdog reaps a hung hyprlock)
+# Blocks until unlock (or until unlock-cleanup.sh reaps a hung hyprlock)
 wait "$HYPRLOCK_PID"

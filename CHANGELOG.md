@@ -6,6 +6,31 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-08-08
+
+### Stuck screensaver recurrence — 2026-07-31 watchdog was dead code; replaced with lock-notify event cleanup
+
+**Problem:** Stuck lock-video screensaver on DP-3 recurred. Live diagnosis found **4 stacked mpvpaper+hyprlock pairs** from the previous evening (each mpvpaper ~18% CPU for 9+ hours): hypridle re-fired `LOCK_START` 6× between 20:40–21:49 (activity at the lock screen reset the idle timer), each run stacking a new pair on top of the hung previous one. Morning unlock orphaned all overlays.
+
+**Why the 7/31 fix never worked:** the watchdog polled logind `LockedHint`, but hyprlock 0.9.6 never calls `SetLockedHint` — the hint stays `no` forever and the journal has zero lock records. All 4 watchdog subshells were still alive, waiting on a yes→no transition that cannot happen. Upstream exit deadlock ([hyprlock#791](https://github.com/hyprwm/hyprlock/issues/791)) is still open; 0.9.6-1 is the latest packaged version. Stuck hyprlocks sit in `futex_do_wait` in normal sleep (not D state) — SIGKILL always works, reboot never needed.
+
+**Fixes applied:**
+- New `.local/bin/unlock-cleanup.sh`, wired to hypridle `on_unlock_cmd` (compositor-driven via `hyprland-lock-notify-v1` — fires on *actual* session unlock, no logind dependency): writes `unlocked` to `/tmp/hypr-lock-state`, 3s grace, `pkill -9` any surviving hyprlock (lock scripts' EXIT traps then reap their own mpvpaper), sweeps leftover `mpvpaper.*lock-video`, `dpms on`, logs `UNLOCK_CLEANUP_DONE hyprlock=N mpvpaper=M` to `/tmp/idle-events.log`.
+- `hypridle.conf`: added `on_lock_cmd` (logs `SESSION_LOCKED`, writes `locked` state) + `on_unlock_cmd`.
+- `lock.sh` + `lock-with-video.sh`: single-instance guard — if hyprlock already running and state is `locked`, log `LOCK_SKIP_ALREADY_LOCKED` and exit (kills the stacking behavior); if running but state says `unlocked`/missing, reap the stale zombie and lock fresh. Removed the inert LockedHint watchdog. Fixed `-o "no-audio --loop"` → `-o "no-audio loop"` in lock-with-video.sh.
+- Super+Shift+L `unstick-lockscreen.sh` panic button unchanged (manual fallback).
+
+**Verified:** guard skip-path and reaper kill-path tested with a fake stuck hyprlock as travis; hypridle restarted clean on the new config. Pending: one real lock→unlock cycle to confirm `SESSION_LOCKED`/`UNLOCK_CLEANUP_*` land in `/tmp/idle-events.log` (proves lock-notify events fire on Hyprland 0.56).
+
+### OpenRGB
+
+- New profiles: `fabled10x-build.orp`, `fabled10x-focus.orp`, `fabled10x-rest.orp`, `off.orp`, `red.orp`; updated `rainbow.orp` and `OpenRGB.json`.
+
+### Shell
+
+- `.bashrc` / `.zshrc`: added `tlog()` — appends timestamped lines to `~/training/log/inbox.md` (training inbox capture, drained by /coach).
+- Synced dconf state blob.
+
 ## 2026-07-31
 
 ### Investigation: "Screensaver never clears off AOC monitor after unlock" — solved, no reboot needed
