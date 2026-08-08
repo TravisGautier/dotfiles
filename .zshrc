@@ -12,3 +12,6 @@ fi
 # Enable 24-bit color for Claude Code markdown rendering
 export COLORTERM=truecolor
 export TERM=xterm-256color
+
+# training inbox capture (~/training/log/inbox.md) — drained by /coach
+tlog() { echo "$(date '+%F %H:%M') $*" >> ~/training/log/inbox.md; }

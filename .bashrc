@@ -166,3 +166,6 @@ export CLAUDE_CODE_TMPDIR="$HOME/.cache/claude-tmp"
 
 # claudeloop
 export PATH="$HOME/.local/bin:$PATH"
+
+# training inbox capture (~/training/log/inbox.md) — drained by /coach
+tlog() { echo "$(date '+%F %H:%M') $*" >> ~/training/log/inbox.md; }
