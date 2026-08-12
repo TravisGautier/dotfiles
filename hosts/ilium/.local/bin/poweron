@@ -1,0 +1,63 @@
+#!/usr/bin/env bash
+# poweron — bring up localhost:3000 on ilium end-to-end:
+#   tunnel (ilium ssh -L 3000 → quivira) + postgres (docker) + Next.js dev server on quivira.
+# Safe to run repeatedly; each layer is checked before it is touched.
+# Works run as travis or as root (explicit key/known_hosts paths, no ~ expansion).
+set -u
+
+PROJ='~/Projects/partymasters'
+KEY=/home/travis/.ssh/id_surface_client
+KNOWN=/home/travis/.ssh/known_hosts
+JUMP='deploy@5.78.90.153'
+
+qssh() {
+  ssh -o IdentityFile="$KEY" -o UserKnownHostsFile="$KNOWN" -o IdentitiesOnly=yes \
+      -o BatchMode=yes -o ConnectTimeout=10 -o ServerAliveInterval=15 \
+      -o ProxyCommand="ssh -i $KEY -o UserKnownHostsFile=$KNOWN -o IdentitiesOnly=yes -o BatchMode=yes -W %h:%p $JUMP" \
+      -p 7777 travis@127.0.0.1 "$@"
+}
+
+up() { curl -so /dev/null -m 3 http://localhost:3000/; }   # any HTTP answer = chain alive
+
+if up; then
+  echo "already up: http://localhost:3000 is answering"
+  exit 0
+fi
+
+# 1) Local forward: something must be listening on ilium's 127.0.0.1:3000.
+if ! ss -tln "( sport = :3000 )" | grep -q 3000; then
+  echo "tunnel: not listening on :3000 — starting quivira-dev-tunnel.service"
+  if [ "$(id -u)" -eq 0 ]; then systemctl start quivira-dev-tunnel.service
+  else sudo systemctl start quivira-dev-tunnel.service; fi
+  sleep 2
+  ss -tln "( sport = :3000 )" | grep -q 3000 || { echo "FAIL: tunnel did not bind :3000 (is quivira reachable? journalctl -u quivira-dev-tunnel)"; exit 1; }
+else
+  echo "tunnel: forward already listening on :3000"
+fi
+
+# 2) Quivira reachable?
+qssh true || { echo "FAIL: cannot ssh to quivira via the VPS jump — is quivira on?"; exit 1; }
+
+# 3) App on quivira.
+if qssh 'ss -tln 2>/dev/null | grep -q ":3000 "'; then
+  echo "quivira: something already listening on :3000"
+else
+  echo "quivira: starting postgres (docker compose, waits for healthy)..."
+  qssh "cd $PROJ && docker compose up -d --wait postgres" || { echo "FAIL: postgres did not come up healthy"; exit 1; }
+  echo "quivira: starting Next.js dev server (user unit partymasters-dev)..."
+  qssh "export XDG_RUNTIME_DIR=/run/user/\$(id -u)
+        systemctl --user reset-failed partymasters-dev 2>/dev/null
+        systemctl --user is-active --quiet partymasters-dev || \
+          systemd-run --user --unit=partymasters-dev --working-directory=\$HOME/Projects/partymasters npm run dev" \
+    || { echo "FAIL: could not launch dev server (systemd user session on quivira?)"; exit 1; }
+fi
+
+# 4) Wait for the chain to answer (turbopack cold start can take a while).
+echo -n "waiting for http://localhost:3000 "
+for _ in $(seq 1 45); do
+  if up; then echo; echo "UP: http://localhost:3000 is live"; exit 0; fi
+  echo -n .; sleep 2
+done
+echo
+echo "FAIL: no answer after 90s. Check on quivira: journalctl --user -u partymasters-dev -n 50"
+exit 1
