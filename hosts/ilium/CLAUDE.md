@@ -17,7 +17,8 @@ This host is **copy-based**, not symlinked: KDE rewrites its rc files constantly
 
 - Shell: `.bashrc`, `.profile`, `.gitconfig`
 - `.config/`: KDE core rc files (`kdeglobals`, `kwinrc`, `kwinoutputconfig.json`, `kglobalshortcutsrc`, `kscreenlockerrc`, `konsolerc`, `ksmserverrc`, `plasma-org.kde.plasma.desktop-appletsrc`, `plasmashellrc`, `plasmanotifyrc`, `kdedefaults/`), `kitty/`, `gtk-3.0/`, `gtk-4.0/`, `git/ignore`, `mimeapps.list`, `powermanagementprofilesrc`, `dictate/vocab.txt`
-- `.local/bin/`: `dictate` (voice dictation: Meta+Space → sox → Groq Whisper → ydotool), `citrix-workspace` wrapper
+- `.local/bin/`: `dictate` (voice dictation: Meta+Space → sox → Groq Whisper → ydotool), `citrix-workspace` wrapper, `poweron` (partymasters dev chain — see the `/poweron` skill)
+- `etc/systemd/system/quivira-dev-tunnel.service` — ssh `-L 3000` forward to quivira, enabled at boot; apply with `sudo cp` + `daemon-reload` on fresh installs
 - `packages-manual.txt`: `apt-mark showmanual` output
 
 ## Secrets — never track
