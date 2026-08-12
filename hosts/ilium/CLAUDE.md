@@ -8,10 +8,10 @@ Ubuntu with KDE Plasma, used as a thin client (Citrix Workspace) and secondary C
 
 ## Dotfiles Architecture
 
-This host is **copy-based**, not symlinked: KDE rewrites its rc files constantly, so live configs stay plain files and the `/git` skill copies changes in and out explicitly.
+This host is **copy-based**, not symlinked: KDE rewrites its rc files constantly, so live configs stay plain files and the `/kubugit` skill copies changes in and out explicitly.
 
 - Restore with `./install.sh` (in this directory) — copies repo → system.
-- Sync live changes back with the `/git` skill — copies system → repo, then commits.
+- Sync live changes back with the `/kubugit` skill — copies system → repo, then commits.
 
 ## Tracked Content
 
