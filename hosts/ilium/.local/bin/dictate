@@ -1,0 +1,109 @@
+#!/usr/bin/env bash
+# Toggle-style voice dictation: records, transcribes via Groq, pastes into the focused window.
+# First invocation starts recording; recording auto-stops after ~2s of silence,
+# or a second invocation stops it early.
+
+set -uo pipefail
+
+CONF_DIR="${XDG_CONFIG_HOME:-$HOME/.config}/dictate"
+CONF="$CONF_DIR/config"
+VOCAB="$CONF_DIR/vocab.txt"
+RUN_DIR="${XDG_RUNTIME_DIR:-/tmp}/dictate"
+PIDFILE="$RUN_DIR/rec.pid"
+WAV="$RUN_DIR/rec.wav"
+LOG="$RUN_DIR/dictate.log"
+
+MAX_SECONDS=120        # hard cap so a stuck session can't run away
+MIN_BYTES=10000        # ~0.3s of 16kHz/16bit mono; below this it was a stray keypress
+
+mkdir -p "$RUN_DIR"
+exec 2>>"$LOG"
+
+notify() { command -v notify-send >/dev/null && notify-send -a Dictate -t "${3:-3000}" "$1" "${2:-}"; }
+die() { notify "Dictation failed" "$1" 6000; echo "$(date -Is) ERROR $1" >>"$LOG"; exit 1; }
+
+# ---------------------------------------------------------------- stop branch
+if [[ -f "$PIDFILE" ]]; then
+    pid=$(<"$PIDFILE")
+    rm -f "$PIDFILE"
+    if kill -0 "$pid" 2>/dev/null; then
+        # SIGINT lets sox finalise the WAV header cleanly; SIGKILL would corrupt it.
+        kill -INT "$pid" 2>/dev/null
+        for _ in {1..40}; do kill -0 "$pid" 2>/dev/null || break; sleep 0.05; done
+        kill -0 "$pid" 2>/dev/null && kill -KILL "$pid" 2>/dev/null
+    fi
+else
+    # ------------------------------------------------------------ start branch
+    command -v rec >/dev/null || die "sox not installed (sudo apt install sox)"
+    rm -f "$WAV"
+    # silence 1 0.1 3% 1 2.0 3% = trim leading silence, stop after 2.0s below 3%
+    rec -q -r 16000 -c 1 -b 16 "$WAV" \
+        silence 1 0.1 3% 1 2.0 3% trim 0 "$MAX_SECONDS" &
+    echo $! >"$PIDFILE"
+    notify "🎤 Listening…" "Meta+Space again to stop" 2000
+    exit 0
+fi
+
+# ------------------------------------------------------------ transcribe path
+[[ -s "$WAV" ]] || die "no audio captured — check your microphone"
+bytes=$(stat -c%s "$WAV")
+if (( bytes < MIN_BYTES )); then
+    notify "Too short" "Nothing transcribed" 2000
+    rm -f "$WAV"
+    exit 0
+fi
+
+[[ -r "$CONF" ]] || die "missing config at $CONF"
+# shellcheck disable=SC1090
+source "$CONF"
+: "${MODEL:=whisper-large-v3-turbo}"
+
+prompt=""
+[[ -r "$VOCAB" ]] && prompt=$(grep -v '^\s*#' "$VOCAB" | tr '\n' ' ')
+
+text=""
+if [[ -n "${GROQ_API_KEY:-}" ]]; then
+    notify "⏳ Transcribing…" "" 1500
+    resp=$(curl -sS --max-time 60 \
+        -w '\n%{http_code}' \
+        https://api.groq.com/openai/v1/audio/transcriptions \
+        -H "Authorization: Bearer $GROQ_API_KEY" \
+        -F "model=$MODEL" \
+        -F "response_format=text" \
+        -F "language=en" \
+        -F "temperature=0" \
+        -F "prompt=$prompt" \
+        -F "file=@$WAV")
+    code=$(tail -n1 <<<"$resp")
+    body=$(sed '$d' <<<"$resp")
+    if [[ "$code" == "200" ]]; then
+        text="$body"
+    else
+        echo "$(date -Is) groq http=$code body=$body" >>"$LOG"
+    fi
+fi
+
+# Offline / API-failure fallback: local whisper.cpp, if it has been set up.
+if [[ -z "${text// /}" ]] && command -v whisper-cli >/dev/null; then
+    model_file=$(ls -S "$HOME/.local/share/whisper/"*.bin 2>/dev/null | tail -1)
+    if [[ -n "$model_file" ]]; then
+        notify "⏳ Transcribing locally…" "$(basename "$model_file")" 2000
+        text=$(whisper-cli -m "$model_file" -f "$WAV" -nt -np -l en 2>/dev/null)
+    fi
+fi
+
+[[ -n "${text// /}" ]] || die "transcription returned nothing (see $LOG)"
+
+# Collapse whitespace/newlines so it lands as a single prompt line.
+text=$(tr '\n' ' ' <<<"$text" | sed -e 's/[[:space:]]\+/ /g' -e 's/^ //' -e 's/ $//')
+
+printf '%s' "$text" | wl-copy || die "wl-copy failed (sudo apt install wl-clipboard)"
+
+if command -v ydotool >/dev/null && ydotool key 29:1 47:1 47:0 29:0 2>/dev/null; then
+    :   # pasted via ctrl+v
+else
+    notify "📋 Copied to clipboard" "ydotool unavailable — paste manually" 4000
+fi
+
+rm -f "$WAV"
+echo "$(date -Is) OK ${#text} chars" >>"$LOG"

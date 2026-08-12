@@ -1,0 +1,10 @@
+[user]
+	name = TravisGautier
+	email = travisgautier@prairietechks.com
+[credential]
+	helper = store --file=/home/travis/.git-credentials
+[core]
+	excludesFile = /home/travis/.config/git/ignore
+[url "https://github.com/"]
+	insteadOf = git@github.com:
+	insteadOf = ssh://git@github.com/

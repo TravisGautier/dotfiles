@@ -1,0 +1,8 @@
+# Vocabulary bias sent to the transcription model (Groq `prompt`, max ~224 tokens).
+# Lines starting with # are ignored. Add any term that gets misheard.
+Claude Code, Anthropic, Opus, Sonnet, Haiku, MCP, subagent, artifact, plan mode
+TypeScript, JavaScript, Python, bash, async, await, stdout, stderr, regex, JSON, YAML
+git, commit, rebase, PR, repo, branch, diff, merge conflict, refactor
+kubectl, Docker, systemd, journalctl, ripgrep, grep, apt, flatpak
+Wayland, KWin, KDE, Plasma, kitty, ydotool, sox, Whisper, Groq
+API key, endpoint, webhook, latency, throughput, quantized, inference

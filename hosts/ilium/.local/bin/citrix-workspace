@@ -1,0 +1,29 @@
+#!/bin/bash
+# Citrix Workspace launcher for Ubuntu 26.04.
+#
+# selfservice/storebrowse/configmgr link against libxml2.so.2, libsoup-2.4.so.1
+# and libmanette-0.2.so.0, none of which exist on 26.04 (libxml2 is now .so.16,
+# webkit2gtk-4.0 and its libsoup2 stack are gone). The 24.04-era builds of those
+# libs live in citrix-compat/ and are injected here via LD_LIBRARY_PATH.
+# libxml2 2.9.14 in turn wants ICU 74, which is also in that directory.
+#
+# Children inherit LD_LIBRARY_PATH, so selfservice's calls out to storebrowse
+# work without wrapping them separately.
+#
+# Dispatches on argv[0]; symlink to it as citrix-storebrowse / citrix-configmgr.
+
+COMPAT="$HOME/.local/lib/citrix-compat"
+ICA=/opt/Citrix/ICAClient
+
+if [ ! -d "$COMPAT" ]; then
+  echo "citrix-workspace: compat libs missing at $COMPAT" >&2
+  exit 1
+fi
+
+export LD_LIBRARY_PATH="$COMPAT${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}"
+
+case "$(basename "$0")" in
+  citrix-storebrowse) exec "$ICA/util/storebrowse" "$@" ;;
+  citrix-configmgr)   exec "$ICA/util/configmgr" "$@" ;;
+  *)                  exec "$ICA/selfservice" "$@" ;;
+esac
