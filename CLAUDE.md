@@ -2,91 +2,22 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-## System Overview
+## Repository Layout
 
-Hyprland-based Arch Linux desktop environment with dual monitors (AOC 4K + ASUS curved), NVIDIA RTX GPU (iGPU disabled in BIOS), and catppuccin-mocha theming.
-
-## Monitor Setup
+Multi-host dotfiles repo. Each machine's configuration lives in its own directory under `hosts/`; nothing host-specific sits at the root.
 
 ```
-DP-3 (AOC U32V3 4K)    - Left, position 0x0, scaled 1.5x
-DP-1 (ASUS VG32VQ1B)   - Right, position 2560x0, native res
+hosts/
+  quivira/   - Arch Linux + Hyprland desktop (primary workstation)
+  ilium/     - Ubuntu + KDE Plasma thin client
 ```
 
-**Important:** Monitor port names are tied to the NVIDIA GPU. The AMD iGPU is disabled in BIOS to prevent port assignment conflicts.
+Each host directory contains that machine's tracked dotfiles (`.bashrc`, `.config/…`, etc.), its own `install.sh`, `CHANGELOG.md`, package lists, and a host-specific `CLAUDE.md` with hardware and environment details.
 
-## Dotfiles Architecture
+## Conventions
 
-This repo uses **symlinks** for config management:
-- `~/.config/hypr` → `~/dotfiles/.config/hypr` (symlink)
-- Shell dotfiles (`.bashrc`, `.zshrc`, etc.) → symlinked to repo
-- `/etc/` configs are tracked but require manual `sudo cp` to apply
-
-Run `./install.sh` to set up symlinks on a new system.
-
-## Key Commands
-
-```bash
-# Restore to new system
-./install.sh
-
-# Install packages
-sudo pacman -S --needed - < packages-official.txt
-yay -S --needed - < packages-aur.txt
-
-# Update package lists
-pacman -Qqe > packages-official.txt
-pacman -Qqm > packages-aur.txt
-
-# Hyprland
-hyprctl monitors          # List monitors with port names
-hyprctl reload            # Reload config without restart
-hyprctl clients           # List windows
-```
-
-## Core Components
-
-| Component | Tool | Config |
-|-----------|------|--------|
-| WM | Hyprland (dwindle) | `.config/hypr/hyprland.conf` |
-| Bar | Waybar | `.config/waybar/config.jsonc`, `style.css` |
-| Terminal | Kitty | `.config/kitty/kitty.conf` |
-| Launcher | hyprlauncher | SUPER+R |
-| Lock | hyprlock | `.config/hypr/hyprlock.conf` |
-| Idle | hypridle | `.config/hypr/hypridle.conf` |
-| Wallpaper | swaybg | exec-once in hyprland.conf |
-
-## Key Keybindings (SUPER = Windows key)
-
-| Keys | Action |
-|------|--------|
-| SUPER+Q | Terminal (kitty) |
-| SUPER+R | App launcher |
-| SUPER+F | Firefox |
-| SUPER+C | Close window |
-| SUPER+L | Lock screen |
-| SUPER+M | Logout menu |
-| SUPER+1-0 | Switch workspace |
-
-## NVIDIA Configuration
-
-Required env vars in hyprland.conf:
-```
-env = LIBVA_DRIVER_NAME,nvidia
-env = GBM_BACKEND,nvidia-drm
-env = __GLX_VENDOR_LIBRARY_NAME,nvidia
-```
-
-NVIDIA modules early-loaded in `/etc/mkinitcpio.conf`:
-```
-MODULES=(nvidia nvidia_modeset nvidia_uvm nvidia_drm)
-```
-
-## Changelog
-
-See `CHANGELOG.md` for configuration history and troubleshooting sessions. **Always update changelog before committing significant changes.**
-
-Format:
-- Date header: `## YYYY-MM-DD`
-- Category: `### Component Name`
-- For debugging: Problem, Diagnosis, Status sections
+- **Never mix hosts:** a change made on one machine goes under that machine's `hosts/<name>/` tree only. Shared root files are limited to this file and `.gitignore`.
+- **Symlink-based on quivira** (`~/.config/hypr`, `~/.gitconfig` point into the repo); **copy-based sync on ilium** (configs are copied in/out by the sync skill).
+- **Changelog before commit:** update the host's `CHANGELOG.md` before any commit touching that host (`## YYYY-MM-DD` date headers, `### Component` sections; debugging entries include Problem / Diagnosis / Status).
+- **No secrets:** never track credential stores (`.git-credentials`, `~/.config/gh/`, API keys). `.gitconfig` files are per-host and reference credential helpers by path only.
+- Restore a machine with `hosts/<name>/install.sh` — each script derives its paths from its own location.

@@ -1,3 +1,8 @@
+# Global git ignore — shared by quivira and ilium
+
+# Claude Code local settings
+**/.claude/settings.local.json
+
 # Logs and temp files
 *.log
 *.tmp
@@ -28,9 +33,10 @@ Thumbnails/
 # Large binary files
 *.iso
 *.img
+
 # Sensitive app data
 **/Bitwarden/
 **/kdeconnect/
 *.pem
 **/privateKey*
-hosts/*/.config/stripe/
+.config/stripe/

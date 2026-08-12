@@ -6,6 +6,18 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 
 ---
 
+## 2026-08-11
+
+### Repo restructure — multi-host hosts/ layout
+
+- Moved the entire quivira tree (shell dotfiles, `.config/`, `.local/`, `etc/`, `install.sh`, package lists, this changelog) into `hosts/quivira/`. The repo root now holds only the shared `CLAUDE.md` and `.gitignore`; `hosts/ilium/` (Ubuntu/KDE thin client) is being added from ilium.
+- Re-pointed the two live symlinks to the new paths: `~/.config/hypr` and `~/.gitconfig` → `~/dotfiles/hosts/quivira/…`. `install.sh` needed no changes — it derives paths from its own location.
+- Split `CLAUDE.md`: repo-root copy describes the multi-host layout and shared conventions; quivira's hardware/Hyprland details moved to `hosts/quivira/CLAUDE.md`.
+- Scoped the `.gitignore` stripe pattern to `hosts/*/.config/stripe/` so it still matches after the move.
+- Folded in the pending working-tree changes from the earlier gitconfig session (`.gitconfig` credential/insteadOf cleanup, trimmed `.config/git/ignore`).
+- **Pending (needs sudo):** the `/hyprgit` skill at `~/.claude/skills/hyprgit/SKILL.md` is root-owned and still references the old root-level paths. Updated copy staged at `~/skill-hyprgit-updated.md`; apply with `sudo cp ~/skill-hyprgit-updated.md ~/.claude/skills/hyprgit/SKILL.md`.
+
+
 ## 2026-08-08
 
 ### Stuck screensaver recurrence — 2026-07-31 watchdog was dead code; replaced with lock-notify event cleanup
