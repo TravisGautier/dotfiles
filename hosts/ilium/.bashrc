@@ -124,5 +124,22 @@ export TERM=xterm-256color
 export CLAUDE_CODE_ENABLE_PROMPT_SUGGESTION=true
 export CLAUDE_CODE_TMPDIR="$HOME/.cache/claude-tmp"
 claude() {
+  # Remote launchers: `claude partymasters|timewave2|quivira` ssh into quivira,
+  # land in that project, and run quivira's own claude wrapper there (its skills,
+  # config, and env come along). Extra args pass through, e.g. `claude pm -c`.
+  # sudo on quivira will ask for the password in the remote terminal — normal.
+  local dir=""
+  case "${1:-}" in
+    partymasters|pm) dir='~/Projects/partymasters' ;;
+    timewave2|tw2)   dir='~/Projects/Timewave2' ;;
+    quivira|q)       dir='~' ;;
+  esac
+  if [ -n "$dir" ]; then
+    shift
+    local args=""
+    [ $# -gt 0 ] && args=$(printf ' %q' "$@")
+    command ssh -t quivira "cd $dir && exec bash -ic 'claude$args'"
+    return
+  fi
   systemd-run --user --scope --slice=claude.slice --quiet -- sudo -E "$HOME/.local/bin/claude" "$@"
 }

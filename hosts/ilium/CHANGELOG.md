@@ -20,3 +20,7 @@ Format: Date-based entries with categorized changes. Complex investigations incl
 - New `~/.local/bin/poweron` + `/poweron` skill: makes `localhost:3000` live end-to-end — checks/starts the ssh `-L 3000` forward (`quivira-dev-tunnel.service`, new system unit, enabled at boot), then over SSH starts postgres (`docker compose up -d --wait postgres`) and the Next.js dev server (transient user unit `partymasters-dev`) on quivira, then polls until HTTP answers.
 - `etc/systemd/system/quivira-dev-tunnel.service` tracked here; apply with `sudo cp` + `systemctl daemon-reload && systemctl enable` on a fresh install.
 - First run surfaced two quivira-side breakages, both fixed: the whole partymasters tree (167k files) was root-owned from the root-run Claude (fixed via docker alpine `chown -R 1000:1000` — travis has docker group but no sudo over SSH), and a stale root-era `.next` cache threw `MODULE_UNPARSABLE` (fixed with `rm -rf .next`).
+
+### Remote Claude launchers in bashrc
+
+- `claude()` wrapper now dispatches project names to quivira over SSH: `claude partymasters` (or `pm`), `claude timewave2` (`tw2`), `claude quivira` (`q`) run `ssh -t quivira`, cd into the project (`~/Projects/partymasters`, `~/Projects/Timewave2`, or `~`), and exec quivira's own `claude` wrapper via `bash -ic` — so its skills, config, and env load natively. Extra args pass through (`claude pm -c`). Any other first argument falls through to the local claude as before. sudo on quivira prompts for the password in the remote terminal.
